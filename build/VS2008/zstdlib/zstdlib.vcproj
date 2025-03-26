@@ -7,7 +7,7 @@
 	RootNamespace="zstdlib"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
-	>
+>
 	<Platforms>
 		<Platform
 			Name="Win32"
@@ -25,7 +25,7 @@
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
-			>
+		>
 			<Tool
 				Name="VCPreBuildEventTool"
 			/>
@@ -99,7 +99,7 @@
 			ConfigurationType="2"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
-			>
+		>
 			<Tool
 				Name="VCPreBuildEventTool"
 			/>
@@ -174,7 +174,7 @@
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
-			>
+		>
 			<Tool
 				Name="VCPreBuildEventTool"
 			/>
@@ -249,7 +249,7 @@
 			ConfigurationType="2"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
-			>
+		>
 			<Tool
 				Name="VCPreBuildEventTool"
 			/>
@@ -327,307 +327,307 @@
 			Name="Source Files"
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
-			>
+		>
 			<File
 				RelativePath="..\..\..\lib\dictBuilder\cover.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\dictBuilder\fastcover.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\dictBuilder\divsufsort.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\common\pool.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\common\threading.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\common\entropy_common.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\hist.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\common\error_private.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\fse_compress.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\common\fse_decompress.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\huf_compress.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\decompress\huf_decompress.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\common\xxhash.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\dictBuilder\zdict.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\common\zstd_common.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstdmt_compress.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_compress.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_compress_literals.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_compress_sequences.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_compress_superblock.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_fast.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_double_fast.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_lazy.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_opt.c"
-				>
-      </File>
+			>
+			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_ldm.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\decompress\zstd_decompress.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\decompress\zstd_decompress_block.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\decompress\zstd_ddict.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\legacy\zstd_v01.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\legacy\zstd_v02.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\legacy\zstd_v03.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\legacy\zstd_v04.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\legacy\zstd_v05.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\legacy\zstd_v06.c"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\legacy\zstd_v07.c"
-				>
+			>
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
+		>
 			<File
 				RelativePath="..\..\..\lib\common\bitstream.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\dictBuilder\divsufsort.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\common\pool.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\common\threading.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\common\error_private.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\zstd_errors.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\common\fse.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\common\fse_static.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\common\huf.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\common\huf_static.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\common\mem.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\common\xxhash.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\zdict.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\dictBuilder\cover.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\dictBuilder\zdict_static.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\zstd.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\common\zstd_internal.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\legacy\zstd_legacy.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstdmt_compress.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_compress.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_compress_literals.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_compress_sequences.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_cwksp.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_compress_superblock.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_fast.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_double_fast.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_lazy.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_opt.h"
-				>
-      </File>
+			>
+			</File>
 			<File
 				RelativePath="..\..\..\lib\compress\zstd_ldm.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\common\zstd_static.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\legacy\zstd_v01.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\legacy\zstd_v02.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\legacy\zstd_v03.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\legacy\zstd_v04.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\legacy\zstd_v05.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\legacy\zstd_v06.h"
-				>
+			>
 			</File>
 			<File
 				RelativePath="..\..\..\lib\legacy\zstd_v07.h"
-				>
+			>
 			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
+		>
 		</Filter>
 	</Files>
 	<Globals>

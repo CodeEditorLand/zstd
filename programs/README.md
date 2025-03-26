@@ -4,93 +4,90 @@ Command Line Interface (CLI) can be created using the `make` command without any
 additional parameters. There are however other Makefile targets that create
 different variations of CLI:
 
--   `zstd` : default CLI supporting gzip-like arguments; includes dictionary
-    builder, benchmark, and supports decompression of legacy zstd formats
--   `zstd_nolegacy` : Same as `zstd` but without support for legacy zstd formats
--   `zstd-small` : CLI optimized for minimal size; no dictionary builder, no
-    benchmark, and no support for legacy zstd formats
--   `zstd-compress` : version of CLI which can only compress into zstd format
--   `zstd-decompress` : version of CLI which can only decompress zstd format
+- `zstd` : default CLI supporting gzip-like arguments; includes dictionary
+  builder, benchmark, and supports decompression of legacy zstd formats
+- `zstd_nolegacy` : Same as `zstd` but without support for legacy zstd formats
+- `zstd-small` : CLI optimized for minimal size; no dictionary builder, no
+  benchmark, and no support for legacy zstd formats
+- `zstd-compress` : version of CLI which can only compress into zstd format
+- `zstd-decompress` : version of CLI which can only decompress zstd format
 
 ### Compilation variables
 
 `zstd` scope can be altered by modifying the following `make` variables :
 
--   **HAVE_THREAD** : multithreading is automatically enabled when `pthread` is
-    detected. It's possible to disable multithread support, by setting
-    `HAVE_THREAD=0`. Example : `make zstd HAVE_THREAD=0` It's also possible to
-    force multithread support, using `HAVE_THREAD=1`. In which case, linking
-    stage will fail if neither `pthread` nor `windows.h` library can be found.
-    This is useful to ensure this feature is not silently disabled.
+- **HAVE_THREAD** : multithreading is automatically enabled when `pthread` is
+  detected. It's possible to disable multithread support, by setting
+  `HAVE_THREAD=0`. Example : `make zstd HAVE_THREAD=0` It's also possible to
+  force multithread support, using `HAVE_THREAD=1`. In which case, linking stage
+  will fail if neither `pthread` nor `windows.h` library can be found. This is
+  useful to ensure this feature is not silently disabled.
 
--   **ZSTD_LEGACY_SUPPORT** : `zstd` can decompress files compressed by older
-    versions of `zstd`. Starting v0.8.0, all versions of `zstd` produce frames
-    compliant with the [specification](../doc/zstd_compression_format.md), and
-    are therefore compatible. But older versions (< v0.8.0) produced different,
-    incompatible, frames. By default, `zstd` supports decoding legacy formats >=
-    v0.4.0 (`ZSTD_LEGACY_SUPPORT=4`). This can be altered by modifying this
-    compilation variable. `ZSTD_LEGACY_SUPPORT=1` means "support all formats >=
-    v0.1.0". `ZSTD_LEGACY_SUPPORT=2` means "support all formats >= v0.2.0", and
-    so on. `ZSTD_LEGACY_SUPPORT=0` means _DO NOT_ support any legacy format. if
-    `ZSTD_LEGACY_SUPPORT >= 8`, it's the same as `0`, since there is no legacy
-    format after `7`. Note : `zstd` only supports decoding older formats, and
-    cannot generate any legacy format.
+- **ZSTD_LEGACY_SUPPORT** : `zstd` can decompress files compressed by older
+  versions of `zstd`. Starting v0.8.0, all versions of `zstd` produce frames
+  compliant with the [specification](../doc/zstd_compression_format.md), and are
+  therefore compatible. But older versions (< v0.8.0) produced different,
+  incompatible, frames. By default, `zstd` supports decoding legacy formats >=
+  v0.4.0 (`ZSTD_LEGACY_SUPPORT=4`). This can be altered by modifying this
+  compilation variable. `ZSTD_LEGACY_SUPPORT=1` means "support all formats >=
+  v0.1.0". `ZSTD_LEGACY_SUPPORT=2` means "support all formats >= v0.2.0", and so
+  on. `ZSTD_LEGACY_SUPPORT=0` means _DO NOT_ support any legacy format. if
+  `ZSTD_LEGACY_SUPPORT >= 8`, it's the same as `0`, since there is no legacy
+  format after `7`. Note : `zstd` only supports decoding older formats, and
+  cannot generate any legacy format.
 
--   **HAVE_ZLIB** : `zstd` can compress and decompress files in `.gz` format.
-    This is ordered through command `--format=gzip`. Alternatively, symlinks
-    named `gzip` or `gunzip` will mimic intended behavior. `.gz` support is
-    automatically enabled when `zlib` library is detected at build time. It's
-    possible to disable `.gz` support, by setting `HAVE_ZLIB=0`. Example :
-    `make zstd HAVE_ZLIB=0` It's also possible to force compilation with zlib
-    support, using `HAVE_ZLIB=1`. In which case, linking stage will fail if
-    `zlib` library cannot be found. This is useful to prevent silent feature
-    disabling.
+- **HAVE_ZLIB** : `zstd` can compress and decompress files in `.gz` format. This
+  is ordered through command `--format=gzip`. Alternatively, symlinks named
+  `gzip` or `gunzip` will mimic intended behavior. `.gz` support is
+  automatically enabled when `zlib` library is detected at build time. It's
+  possible to disable `.gz` support, by setting `HAVE_ZLIB=0`. Example :
+  `make zstd HAVE_ZLIB=0` It's also possible to force compilation with zlib
+  support, using `HAVE_ZLIB=1`. In which case, linking stage will fail if `zlib`
+  library cannot be found. This is useful to prevent silent feature disabling.
 
--   **HAVE_LZMA** : `zstd` can compress and decompress files in `.xz` and
-    `.lzma` formats. This is ordered through commands `--format=xz` and
-    `--format=lzma` respectively. Alternatively, symlinks named `xz`, `unxz`,
-    `lzma`, or `unlzma` will mimic intended behavior. `.xz` and `.lzma` support
-    is automatically enabled when `lzma` library is detected at build time. It's
-    possible to disable `.xz` and `.lzma` support, by setting `HAVE_LZMA=0`.
-    Example : `make zstd HAVE_LZMA=0` It's also possible to force compilation
-    with lzma support, using `HAVE_LZMA=1`. In which case, linking stage will
-    fail if `lzma` library cannot be found. This is useful to prevent silent
-    feature disabling.
+- **HAVE_LZMA** : `zstd` can compress and decompress files in `.xz` and `.lzma`
+  formats. This is ordered through commands `--format=xz` and `--format=lzma`
+  respectively. Alternatively, symlinks named `xz`, `unxz`, `lzma`, or `unlzma`
+  will mimic intended behavior. `.xz` and `.lzma` support is automatically
+  enabled when `lzma` library is detected at build time. It's possible to
+  disable `.xz` and `.lzma` support, by setting `HAVE_LZMA=0`. Example :
+  `make zstd HAVE_LZMA=0` It's also possible to force compilation with lzma
+  support, using `HAVE_LZMA=1`. In which case, linking stage will fail if `lzma`
+  library cannot be found. This is useful to prevent silent feature disabling.
 
--   **HAVE_LZ4** : `zstd` can compress and decompress files in `.lz4` formats.
-    This is ordered through commands `--format=lz4`. Alternatively, symlinks
-    named `lz4`, or `unlz4` will mimic intended behavior. `.lz4` support is
-    automatically enabled when `lz4` library is detected at build time. It's
-    possible to disable `.lz4` support, by setting `HAVE_LZ4=0` . Example :
-    `make zstd HAVE_LZ4=0` It's also possible to force compilation with lz4
-    support, using `HAVE_LZ4=1`. In which case, linking stage will fail if `lz4`
-    library cannot be found. This is useful to prevent silent feature disabling.
+- **HAVE_LZ4** : `zstd` can compress and decompress files in `.lz4` formats.
+  This is ordered through commands `--format=lz4`. Alternatively, symlinks named
+  `lz4`, or `unlz4` will mimic intended behavior. `.lz4` support is
+  automatically enabled when `lz4` library is detected at build time. It's
+  possible to disable `.lz4` support, by setting `HAVE_LZ4=0` . Example :
+  `make zstd HAVE_LZ4=0` It's also possible to force compilation with lz4
+  support, using `HAVE_LZ4=1`. In which case, linking stage will fail if `lz4`
+  library cannot be found. This is useful to prevent silent feature disabling.
 
--   **ZSTD_NOBENCH** : `zstd` cli will be compiled without its integrated
-    benchmark module. This can be useful to produce smaller binaries. In this
-    case, the corresponding unit can also be excluded from compilation target.
+- **ZSTD_NOBENCH** : `zstd` cli will be compiled without its integrated
+  benchmark module. This can be useful to produce smaller binaries. In this
+  case, the corresponding unit can also be excluded from compilation target.
 
--   **ZSTD_NODICT** : `zstd` cli will be compiled without support for the
-    integrated dictionary builder. This can be useful to produce smaller
-    binaries. In this case, the corresponding unit can also be excluded from
-    compilation target.
+- **ZSTD_NODICT** : `zstd` cli will be compiled without support for the
+  integrated dictionary builder. This can be useful to produce smaller binaries.
+  In this case, the corresponding unit can also be excluded from compilation
+  target.
 
--   **ZSTD_NOCOMPRESS** : `zstd` cli will be compiled without support for
-    compression. The resulting binary will only be able to decompress files.
-    This can be useful to produce smaller binaries. A corresponding `Makefile`
-    target using this ability is `zstd-decompress`.
+- **ZSTD_NOCOMPRESS** : `zstd` cli will be compiled without support for
+  compression. The resulting binary will only be able to decompress files. This
+  can be useful to produce smaller binaries. A corresponding `Makefile` target
+  using this ability is `zstd-decompress`.
 
--   **ZSTD_NODECOMPRESS** : `zstd` cli will be compiled without support for
-    decompression. The resulting binary will only be able to compress files.
-    This can be useful to produce smaller binaries. A corresponding `Makefile`
-    target using this ability is `zstd-compress`.
+- **ZSTD_NODECOMPRESS** : `zstd` cli will be compiled without support for
+  decompression. The resulting binary will only be able to compress files. This
+  can be useful to produce smaller binaries. A corresponding `Makefile` target
+  using this ability is `zstd-compress`.
 
--   **BACKTRACE** : `zstd` can display a stack backtrace when execution
-    generates a runtime exception. By default, this feature may be
-    degraded/disabled on some platforms unless additional compiler directives
-    are applied. When triaging a runtime issue, enabling this feature can
-    provide more context to determine the location of the fault. Example :
-    `make zstd BACKTRACE=1`
+- **BACKTRACE** : `zstd` can display a stack backtrace when execution generates
+  a runtime exception. By default, this feature may be degraded/disabled on some
+  platforms unless additional compiler directives are applied. When triaging a
+  runtime issue, enabling this feature can provide more context to determine the
+  location of the fault. Example : `make zstd BACKTRACE=1`
 
 ### Aggregation of parameters
 
@@ -102,23 +99,23 @@ joined into `-b1e18i1`.
 It's possible to invoke `zstd` through a symlink. When the name of the symlink
 has a specific value, it triggers an associated behavior.
 
--   `zstdmt` : compress using all cores available on local system.
--   `zcat` : will decompress and output target file using any of the supported
-    formats. `gzcat` and `zstdcat` are also equivalent.
--   `gzip` : if zlib support is enabled, will mimic `gzip` by compressing file
-    using `.gz` format, removing source file by default (use `--keep` to
-    preserve). If zlib is not supported, triggers an error.
--   `xz` : if lzma support is enabled, will mimic `xz` by compressing file using
-    `.xz` format, removing source file by default (use `--keep` to preserve). If
-    xz is not supported, triggers an error.
--   `lzma` : if lzma support is enabled, will mimic `lzma` by compressing file
-    using `.lzma` format, removing source file by default (use `--keep` to
-    preserve). If lzma is not supported, triggers an error.
--   `lz4` : if lz4 support is enabled, will mimic `lz4` by compressing file
-    using `.lz4` format. If lz4 is not supported, triggers an error.
--   `unzstd` and `unlz4` will decompress any of the supported format.
--   `ungz`, `unxz` and `unlzma` will do the same, and will also remove source
-    file by default (use `--keep` to preserve).
+- `zstdmt` : compress using all cores available on local system.
+- `zcat` : will decompress and output target file using any of the supported
+  formats. `gzcat` and `zstdcat` are also equivalent.
+- `gzip` : if zlib support is enabled, will mimic `gzip` by compressing file
+  using `.gz` format, removing source file by default (use `--keep` to
+  preserve). If zlib is not supported, triggers an error.
+- `xz` : if lzma support is enabled, will mimic `xz` by compressing file using
+  `.xz` format, removing source file by default (use `--keep` to preserve). If
+  xz is not supported, triggers an error.
+- `lzma` : if lzma support is enabled, will mimic `lzma` by compressing file
+  using `.lzma` format, removing source file by default (use `--keep` to
+  preserve). If lzma is not supported, triggers an error.
+- `lz4` : if lz4 support is enabled, will mimic `lz4` by compressing file using
+  `.lz4` format. If lz4 is not supported, triggers an error.
+- `unzstd` and `unlz4` will decompress any of the supported format.
+- `ungz`, `unxz` and `unlzma` will do the same, and will also remove source file
+  by default (use `--keep` to preserve).
 
 ### Dictionary builder in Command Line Interface
 
@@ -144,15 +141,15 @@ Usage of the dictionary builder and created dictionaries with CLI:
    `zstd --decompress FILE.zst -D dictionaryName`
 
 ### Benchmark in Command Line Interface
-<<<<<<< HEAD
-CLI includes in-memory compression benchmark module for zstd.
-The benchmark is conducted using given filenames. The files are read into memory and joined together.
-It makes benchmark more precise as it eliminates I/O overhead.
-Multiple filenames can be supplied, as multiple parameters, with wildcards,
-or directory names can be used with `-r` option.
-If no file is provided, the benchmark will use a procedurally generated "lorem ipsum" content.
-=======
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
+
+<<<<<<< HEAD CLI includes in-memory compression benchmark module for zstd. The
+benchmark is conducted using given filenames. The files are read into memory and
+joined together. It makes benchmark more precise as it eliminates I/O overhead.
+Multiple filenames can be supplied, as multiple parameters, with wildcards, or
+directory names can be used with `-r` option. If no file is provided, the
+benchmark will use a procedurally generated "lorem ipsum" content. =======
+
+> > > > > > > 037abb476563f4a9926392ddf7fe62db27171149
 
 CLI includes in-memory compression benchmark module for zstd. The benchmark is
 conducted using given filenames. The files are read into memory and joined
@@ -160,16 +157,17 @@ together. It makes benchmark more precise as it eliminates I/O overhead.
 Multiple filenames can be supplied, as multiple parameters, with wildcards, or
 names of directories can be used as parameters with `-r` option.
 
-<<<<<<< HEAD
-The benchmark can also be used to test specific parameters,
-such as number of threads (`-T#`), or advanced parameters (`--zstd=#`), or dictionary compression (`-D DICTIONARY`),
-and many others available on command for regular compression and decompression.
+<<<<<<< HEAD The benchmark can also be used to test specific parameters, such as
+number of threads (`-T#`), or advanced parameters (`--zstd=#`), or dictionary
+compression (`-D DICTIONARY`), and many others available on command for regular
+compression and decompression.
 
-=======
-The benchmark measures ratio, compressed size, compression and decompression
-speed. One can select compression levels starting from `-b` and ending with
-`-e`. The `-i` parameter selects minimal time used for each of tested levels.
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
+======= The benchmark measures ratio, compressed size, compression and
+decompression speed. One can select compression levels starting from `-b` and
+ending with `-e`. The `-i` parameter selects minimal time used for each of
+tested levels.
+
+> > > > > > > 037abb476563f4a9926392ddf7fe62db27171149
 
 ### Usage of Command Line Interface
 

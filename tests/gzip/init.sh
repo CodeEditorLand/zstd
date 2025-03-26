@@ -57,14 +57,18 @@
 #   4. Finally
 #   $ exit
 
-ME_=`expr "./$0" : '.*/\(.*\)$'`
+ME_=$(expr "./$0" : '.*/\(.*\)$')
 
 # We use a trap below for cleanup.  This requires us to go through
 # hoops to get the right exit status transported through the handler.
 # So use 'Exit STATUS' instead of 'exit STATUS' inside of the tests.
 # Turn off errexit here so that we don't trip the bug with OSF1/Tru64
 # sh inside this function.
-Exit () { set +e; (exit $1); exit $1; }
+Exit() {
+	set +e
+	(exit $1)
+	exit $1
+}
 
 # Print warnings (e.g., about skipped and failed tests) to this file number.
 # Override by defining to say, 9, in init.cfg, and putting say,
@@ -78,20 +82,36 @@ Exit () { set +e; (exit $1); exit $1; }
 # Always write the full diagnostic to stderr.
 # When stderr_fileno_ is not 2, also emit the first line of the
 # diagnostic to that file descriptor.
-warn_ ()
-{
-  # If IFS does not start with ' ', set it and emit the warning in a subshell.
-  case $IFS in
-    ' '*) printf '%s\n' "$*" >&2
-          test $stderr_fileno_ = 2 \
-            || { printf '%s\n' "$*" | sed 1q >&$stderr_fileno_ ; } ;;
-    *) (IFS=' '; warn_ "$@");;
-  esac
+warn_() {
+	# If IFS does not start with ' ', set it and emit the warning in a subshell.
+	case $IFS in
+		' '*)
+			printf '%s\n' "$*" >&2
+			test $stderr_fileno_ = 2 \
+				|| { printf '%s\n' "$*" | sed 1q >&$stderr_fileno_; }
+			;;
+		*) (
+			IFS=' '
+			warn_ "$@"
+		) ;;
+	esac
 }
-fail_ () { warn_ "$ME_: failed test: $@"; Exit 1; }
-skip_ () { warn_ "$ME_: skipped test: $@"; Exit 77; }
-fatal_ () { warn_ "$ME_: hard error: $@"; Exit 99; }
-framework_failure_ () { warn_ "$ME_: set-up failure: $@"; Exit 99; }
+fail_() {
+	warn_ "$ME_: failed test: $@"
+	Exit 1
+}
+skip_() {
+	warn_ "$ME_: skipped test: $@"
+	Exit 77
+}
+fatal_() {
+	warn_ "$ME_: hard error: $@"
+	Exit 99
+}
+framework_failure_() {
+	warn_ "$ME_: set-up failure: $@"
+	Exit 99
+}
 
 # This is used to simplify checking of the return value
 # which is useful when ensuring a command fails as desired.
@@ -99,32 +119,33 @@ framework_failure_ () { warn_ "$ME_: set-up failure: $@"; Exit 99; }
 # a segfault in command for example.  With this helper you
 # instead check an explicit exit code like
 #   returns_ 1 command ... || fail
-returns_ () {
-  # Disable tracing so it doesn't interfere with stderr of the wrapped command
-  { set +x; } 2>/dev/null
+returns_() {
+	# Disable tracing so it doesn't interfere with stderr of the wrapped command
+	{ set +x; } 2> /dev/null
 
-  local exp_exit="$1"
-  shift
-  "$@"
-  test $? -eq $exp_exit && ret_=0 || ret_=1
+	local exp_exit="$1"
+	shift
+	"$@"
+	test $? -eq $exp_exit && ret_=0 || ret_=1
 
-  if test "$VERBOSE" = yes && test "$gl_set_x_corrupts_stderr_" = false; then
-    set -x
-  fi
-  { return $ret_; } 2>/dev/null
+	if test "$VERBOSE" = yes && test "$gl_set_x_corrupts_stderr_" = false; then
+		set -x
+	fi
+	{ return $ret_; } 2> /dev/null
 }
 
 # Sanitize this shell to POSIX mode, if possible.
-DUALCASE=1; export DUALCASE
-if test -n "${ZSH_VERSION+set}" && (emulate sh) >/dev/null 2>&1; then
-  emulate sh
-  NULLCMD=:
-  alias -g '${1+"$@"}'='"$@"'
-  setopt NO_GLOB_SUBST
+DUALCASE=1
+export DUALCASE
+if test -n "${ZSH_VERSION+set}" && (emulate sh) > /dev/null 2>&1; then
+	emulate sh
+	NULLCMD=:
+	alias -g '${1+"$@"}'='"$@"'
+	setopt NO_GLOB_SUBST
 else
-  case `(set -o) 2>/dev/null` in
-    *posix*) set -o posix ;;
-  esac
+	case $( (set -o) 2> /dev/null) in
+		*posix*) set -o posix ;;
+	esac
 fi
 
 # We require $(...) support unconditionally.
@@ -166,69 +187,68 @@ v=abx
 '
 
 if test "x$1" = "x--no-reexec"; then
-  shift
+	shift
 else
-  # Assume a working shell.  Export to subshells (setup_ needs this).
-  gl_set_x_corrupts_stderr_=false
-  export gl_set_x_corrupts_stderr_
+	# Assume a working shell.  Export to subshells (setup_ needs this).
+	gl_set_x_corrupts_stderr_=false
+	export gl_set_x_corrupts_stderr_
 
-  # Record the first marginally acceptable shell.
-  marginal_=
+	# Record the first marginally acceptable shell.
+	marginal_=
 
-  # Search for a shell that meets our requirements.
-  for re_shell_ in __current__ "${CONFIG_SHELL:-no_shell}" \
-      /bin/sh bash dash zsh pdksh fail
-  do
-    test "$re_shell_" = no_shell && continue
+	# Search for a shell that meets our requirements.
+	for re_shell_ in __current__ "${CONFIG_SHELL:-no_shell}" \
+		/bin/sh bash dash zsh pdksh fail; do
+		test "$re_shell_" = no_shell && continue
 
-    # If we've made it all the way to the sentinel, "fail" without
-    # finding even a marginal shell, skip this test.
-    if test "$re_shell_" = fail; then
-      test -z "$marginal_" && skip_ failed to find an adequate shell
-      re_shell_=$marginal_
-      break
-    fi
+		# If we've made it all the way to the sentinel, "fail" without
+		# finding even a marginal shell, skip this test.
+		if test "$re_shell_" = fail; then
+			test -z "$marginal_" && skip_ failed to find an adequate shell
+			re_shell_=$marginal_
+			break
+		fi
 
-    # When testing the current shell, simply "eval" the test code.
-    # Otherwise, run it via $re_shell_ -c ...
-    if test "$re_shell_" = __current__; then
-      # 'eval'ing this code makes Solaris 10's /bin/sh exit with
-      # $? set to 2.  It does not evaluate any of the code after the
-      # "unexpected" first '('.  Thus, we must run it in a subshell.
-      ( eval "$gl_shell_test_script_" ) > /dev/null 2>&1
-    else
-      "$re_shell_" -c "$gl_shell_test_script_" 2>/dev/null
-    fi
+		# When testing the current shell, simply "eval" the test code.
+		# Otherwise, run it via $re_shell_ -c ...
+		if test "$re_shell_" = __current__; then
+			# 'eval'ing this code makes Solaris 10's /bin/sh exit with
+			# $? set to 2.  It does not evaluate any of the code after the
+			# "unexpected" first '('.  Thus, we must run it in a subshell.
+			(eval "$gl_shell_test_script_") > /dev/null 2>&1
+		else
+			"$re_shell_" -c "$gl_shell_test_script_" 2> /dev/null
+		fi
 
-    st_=$?
+		st_=$?
 
-    # $re_shell_ works just fine.  Use it.
-    if test $st_ = 10; then
-      gl_set_x_corrupts_stderr_=false
-      break
-    fi
+		# $re_shell_ works just fine.  Use it.
+		if test $st_ = 10; then
+			gl_set_x_corrupts_stderr_=false
+			break
+		fi
 
-    # If this is our first marginally acceptable shell, remember it.
-    if test "$st_:$marginal_" = 9: ; then
-      marginal_="$re_shell_"
-      gl_set_x_corrupts_stderr_=true
-    fi
-  done
+		# If this is our first marginally acceptable shell, remember it.
+		if test "$st_:$marginal_" = 9:; then
+			marginal_="$re_shell_"
+			gl_set_x_corrupts_stderr_=true
+		fi
+	done
 
-  if test "$re_shell_" != __current__; then
-    # Found a usable shell.  Preserve -v and -x.
-    case $- in
-      *v*x* | *x*v*) opts_=-vx ;;
-      *v*) opts_=-v ;;
-      *x*) opts_=-x ;;
-      *) opts_= ;;
-    esac
-    re_shell=$re_shell_
-    export re_shell
-    exec "$re_shell_" $opts_ "$0" --no-reexec "$@"
-    echo "$ME_: exec failed" 1>&2
-    exit 127
-  fi
+	if test "$re_shell_" != __current__; then
+		# Found a usable shell.  Preserve -v and -x.
+		case $- in
+			*v*x* | *x*v*) opts_=-vx ;;
+			*v*) opts_=-v ;;
+			*x*) opts_=-x ;;
+			*) opts_= ;;
+		esac
+		re_shell=$re_shell_
+		export re_shell
+		exec "$re_shell_" $opts_ "$0" --no-reexec "$@"
+		echo "$ME_: exec failed" 1>&2
+		exit 127
+	fi
 fi
 
 # If this is bash, turn off all aliases.
@@ -251,15 +271,14 @@ export MALLOC_PERTURB_
 # This is a stub function that is run upon trap (upon regular exit and
 # interrupt).  Override it with a per-test function, e.g., to unmount
 # a partition, or to undo any other global state changes.
-cleanup_ () { :; }
+cleanup_() { :; }
 
 # Emit a header similar to that from diff -u;  Print the simulated "diff"
 # command so that the order of arguments is clear.  Don't bother with @@ lines.
-emit_diff_u_header_ ()
-{
-  printf '%s\n' "diff -u $*" \
-    "--- $1	1970-01-01" \
-    "+++ $2	1970-01-01"
+emit_diff_u_header_() {
+	printf '%s\n' "diff -u $*" \
+		"--- $1	1970-01-01" \
+		"+++ $2	1970-01-01"
 }
 
 # Arrange not to let diff or cmp operate on /dev/null,
@@ -268,143 +287,149 @@ emit_diff_u_header_ ()
 # When one argument is /dev/null and the other is not empty,
 # cat the nonempty file to stderr and return 1.
 # Otherwise, return 0.
-compare_dev_null_ ()
-{
-  test $# = 2 || return 2
+compare_dev_null_() {
+	test $# = 2 || return 2
 
-  if test "x$1" = x/dev/null; then
-    test -s "$2" || return 0
-    emit_diff_u_header_ "$@"; sed 's/^/+/' "$2"
-    return 1
-  fi
+	if test "x$1" = x/dev/null; then
+		test -s "$2" || return 0
+		emit_diff_u_header_ "$@"
+		sed 's/^/+/' "$2"
+		return 1
+	fi
 
-  if test "x$2" = x/dev/null; then
-    test -s "$1" || return 0
-    emit_diff_u_header_ "$@"; sed 's/^/-/' "$1"
-    return 1
-  fi
+	if test "x$2" = x/dev/null; then
+		test -s "$1" || return 0
+		emit_diff_u_header_ "$@"
+		sed 's/^/-/' "$1"
+		return 1
+	fi
 
-  return 2
+	return 2
 }
 
-if diff_out_=`exec 2>/dev/null; diff -u "$0" "$0" < /dev/null` \
-   && diff -u Makefile "$0" 2>/dev/null | grep '^[+]#!' >/dev/null; then
-  # diff accepts the -u option and does not (like AIX 7 'diff') produce an
-  # extra space on column 1 of every content line.
-  if test -z "$diff_out_"; then
-    compare_ () { diff -u "$@"; }
-  else
-    compare_ ()
-    {
-      if diff -u "$@" > diff.out; then
-        # No differences were found, but Solaris 'diff' produces output
-        # "No differences encountered". Hide this output.
-        rm -f diff.out
-        true
-      else
-        cat diff.out
-        rm -f diff.out
-        false
-      fi
-    }
-  fi
+if diff_out_=$(
+	exec 2> /dev/null
+	diff -u "$0" "$0" < /dev/null
+) \
+	&& diff -u Makefile "$0" 2> /dev/null | grep '^[+]#!' > /dev/null; then
+	# diff accepts the -u option and does not (like AIX 7 'diff') produce an
+	# extra space on column 1 of every content line.
+	if test -z "$diff_out_"; then
+		compare_() { diff -u "$@"; }
+	else
+		compare_() {
+			if diff -u "$@" > diff.out; then
+				# No differences were found, but Solaris 'diff' produces output
+				# "No differences encountered". Hide this output.
+				rm -f diff.out
+				true
+			else
+				cat diff.out
+				rm -f diff.out
+				false
+			fi
+		}
+	fi
 elif
-  for diff_opt_ in -U3 -c '' no; do
-    test "$diff_opt_" = no && break
-    diff_out_=`exec 2>/dev/null; diff $diff_opt_ "$0" "$0" </dev/null` && break
-  done
-  test "$diff_opt_" != no
+	for diff_opt_ in -U3 -c '' no; do
+		test "$diff_opt_" = no && break
+		diff_out_=$(
+			exec 2> /dev/null
+			diff $diff_opt_ "$0" "$0" < /dev/null
+		) && break
+	done
+	test "$diff_opt_" != no
 then
-  if test -z "$diff_out_"; then
-    compare_ () { diff $diff_opt_ "$@"; }
-  else
-    compare_ ()
-    {
-      if diff $diff_opt_ "$@" > diff.out; then
-        # No differences were found, but AIX and HP-UX 'diff' produce output
-        # "No differences encountered" or "There are no differences between the
-        # files.". Hide this output.
-        rm -f diff.out
-        true
-      else
-        cat diff.out
-        rm -f diff.out
-        false
-      fi
-    }
-  fi
-elif cmp -s /dev/null /dev/null 2>/dev/null; then
-  compare_ () { cmp -s "$@"; }
+	if test -z "$diff_out_"; then
+		compare_() { diff $diff_opt_ "$@"; }
+	else
+		compare_() {
+			if diff $diff_opt_ "$@" > diff.out; then
+				# No differences were found, but AIX and HP-UX 'diff' produce output
+				# "No differences encountered" or "There are no differences between the
+				# files.". Hide this output.
+				rm -f diff.out
+				true
+			else
+				cat diff.out
+				rm -f diff.out
+				false
+			fi
+		}
+	fi
+elif cmp -s /dev/null /dev/null 2> /dev/null; then
+	compare_() { cmp -s "$@"; }
 else
-  compare_ () { cmp "$@"; }
+	compare_() { cmp "$@"; }
 fi
 
 # Usage: compare EXPECTED ACTUAL
 #
 # Given compare_dev_null_'s preprocessing, defer to compare_ if 2 or more.
 # Otherwise, propagate $? to caller: any diffs have already been printed.
-compare ()
-{
-  # This looks like it can be factored to use a simple "case $?"
-  # after unchecked compare_dev_null_ invocation, but that would
-  # fail in a "set -e" environment.
-  if compare_dev_null_ "$@"; then
-    return 0
-  else
-    case $? in
-      1) return 1;;
-      *) compare_ "$@";;
-    esac
-  fi
+compare() {
+	# This looks like it can be factored to use a simple "case $?"
+	# after unchecked compare_dev_null_ invocation, but that would
+	# fail in a "set -e" environment.
+	if compare_dev_null_ "$@"; then
+		return 0
+	else
+		case $? in
+			1) return 1 ;;
+			*) compare_ "$@" ;;
+		esac
+	fi
 }
 
 # An arbitrary prefix to help distinguish test directories.
-testdir_prefix_ () { printf gt; }
+testdir_prefix_() { printf gt; }
 
 # Run the user-overridable cleanup_ function, remove the temporary
 # directory and exit with the incoming value of $?.
-remove_tmp_ ()
-{
-  __st=$?
-  cleanup_
-  # cd out of the directory we're about to remove
-  cd "$initial_cwd_" || cd / || cd /tmp
-  chmod -R u+rwx "$test_dir_"
-  # If removal fails and exit status was to be 0, then change it to 1.
-  rm -rf "$test_dir_" || { test $__st = 0 && __st=1; }
-  exit $__st
+remove_tmp_() {
+	__st=$?
+	cleanup_
+	# cd out of the directory we're about to remove
+	cd "$initial_cwd_" || cd / || cd /tmp
+	chmod -R u+rwx "$test_dir_"
+	# If removal fails and exit status was to be 0, then change it to 1.
+	rm -rf "$test_dir_" || { test $__st = 0 && __st=1; }
+	exit $__st
 }
 
 # Given a directory name, DIR, if every entry in it that matches *.exe
 # contains only the specified bytes (see the case stmt below), then print
 # a space-separated list of those names and return 0.  Otherwise, don't
 # print anything and return 1.  Naming constraints apply also to DIR.
-find_exe_basenames_ ()
-{
-  feb_dir_=$1
-  feb_fail_=0
-  feb_result_=
-  feb_sp_=
-  for feb_file_ in $feb_dir_/*.exe; do
-    # If there was no *.exe file, or there existed a file named "*.exe" that
-    # was deleted between the above glob expansion and the existence test
-    # below, just skip it.
-    test "x$feb_file_" = "x$feb_dir_/*.exe" && test ! -f "$feb_file_" \
-      && continue
-    # Exempt [.exe, since we can't create a function by that name, yet
-    # we can't invoke [ by PATH search anyways due to shell builtins.
-    test "x$feb_file_" = "x$feb_dir_/[.exe" && continue
-    case $feb_file_ in
-      *[!-a-zA-Z/0-9_.+]*) feb_fail_=1; break;;
-      *) # Remove leading file name components as well as the .exe suffix.
-         feb_file_=${feb_file_##*/}
-         feb_file_=${feb_file_%.exe}
-         feb_result_="$feb_result_$feb_sp_$feb_file_";;
-    esac
-    feb_sp_=' '
-  done
-  test $feb_fail_ = 0 && printf %s "$feb_result_"
-  return $feb_fail_
+find_exe_basenames_() {
+	feb_dir_=$1
+	feb_fail_=0
+	feb_result_=
+	feb_sp_=
+	for feb_file_ in $feb_dir_/*.exe; do
+		# If there was no *.exe file, or there existed a file named "*.exe" that
+		# was deleted between the above glob expansion and the existence test
+		# below, just skip it.
+		test "x$feb_file_" = "x$feb_dir_/*.exe" && test ! -f "$feb_file_" \
+			&& continue
+		# Exempt [.exe, since we can't create a function by that name, yet
+		# we can't invoke [ by PATH search anyways due to shell builtins.
+		test "x$feb_file_" = "x$feb_dir_/[.exe" && continue
+		case $feb_file_ in
+			*[!-a-zA-Z/0-9_.+]*)
+				feb_fail_=1
+				break
+				;;
+			*) # Remove leading file name components as well as the .exe suffix.
+				feb_file_=${feb_file_##*/}
+				feb_file_=${feb_file_%.exe}
+				feb_result_="$feb_result_$feb_sp_$feb_file_"
+				;;
+		esac
+		feb_sp_=' '
+	done
+	test $feb_fail_ = 0 && printf %s "$feb_result_"
+	return $feb_fail_
 }
 
 # Consider the files in directory, $1.
@@ -412,84 +437,87 @@ find_exe_basenames_ ()
 # PROG that simply invokes PROG.exe, then return 0.  If any selected
 # file name or the directory name, $1, contains an unexpected character,
 # define no alias and return 1.
-create_exe_shims_ ()
-{
-  case $EXEEXT in
-    '') return 0 ;;
-    .exe) ;;
-    *) echo "$0: unexpected \$EXEEXT value: $EXEEXT" 1>&2; return 1 ;;
-  esac
+create_exe_shims_() {
+	case $EXEEXT in
+		'') return 0 ;;
+		.exe) ;;
+		*)
+			echo "$0: unexpected \$EXEEXT value: $EXEEXT" 1>&2
+			return 1
+			;;
+	esac
 
-  base_names_=`find_exe_basenames_ $1` \
-    || { echo "$0 (exe_shim): skipping directory: $1" 1>&2; return 0; }
+	base_names_=$(find_exe_basenames_ $1) \
+		|| {
+			echo "$0 (exe_shim): skipping directory: $1" 1>&2
+			return 0
+		}
 
-  if test -n "$base_names_"; then
-    for base_ in $base_names_; do
-      alias "$base_"="$base_$EXEEXT"
-    done
-  fi
+	if test -n "$base_names_"; then
+		for base_ in $base_names_; do
+			alias "$base_"="$base_$EXEEXT"
+		done
+	fi
 
-  return 0
+	return 0
 }
 
 # Use this function to prepend to PATH an absolute name for each
 # specified, possibly-$initial_cwd_-relative, directory.
-path_prepend_ ()
-{
-  while test $# != 0; do
-    path_dir_=$1
-    case $path_dir_ in
-      '') fail_ "invalid path dir: '$1'";;
-      /*) abs_path_dir_=$path_dir_;;
-      *) abs_path_dir_=$initial_cwd_/$path_dir_;;
-    esac
-    case $abs_path_dir_ in
-      *:*) fail_ "invalid path dir: '$abs_path_dir_'";;
-    esac
-    PATH="$abs_path_dir_:$PATH"
+path_prepend_() {
+	while test $# != 0; do
+		path_dir_=$1
+		case $path_dir_ in
+			'') fail_ "invalid path dir: '$1'" ;;
+			/*) abs_path_dir_=$path_dir_ ;;
+			*) abs_path_dir_=$initial_cwd_/$path_dir_ ;;
+		esac
+		case $abs_path_dir_ in
+			*:*) fail_ "invalid path dir: '$abs_path_dir_'" ;;
+		esac
+		PATH="$abs_path_dir_:$PATH"
 
-    # Create an alias, FOO, for each FOO.exe in this directory.
-    create_exe_shims_ "$abs_path_dir_" \
-      || fail_ "something failed (above): $abs_path_dir_"
-    shift
-  done
-  export PATH
+		# Create an alias, FOO, for each FOO.exe in this directory.
+		create_exe_shims_ "$abs_path_dir_" \
+			|| fail_ "something failed (above): $abs_path_dir_"
+		shift
+	done
+	export PATH
 }
 
-setup_ ()
-{
-  if test "$VERBOSE" = yes; then
-    # Test whether set -x may cause the selected shell to corrupt an
-    # application's stderr.  Many do, including zsh-4.3.10 and the /bin/sh
-    # from SunOS 5.11, OpenBSD 4.7 and Irix 5.x and 6.5.
-    # If enabling verbose output this way would cause trouble, simply
-    # issue a warning and refrain.
-    if $gl_set_x_corrupts_stderr_; then
-      warn_ "using SHELL=$SHELL with 'set -x' corrupts stderr"
-    else
-      set -x
-    fi
-  fi
+setup_() {
+	if test "$VERBOSE" = yes; then
+		# Test whether set -x may cause the selected shell to corrupt an
+		# application's stderr.  Many do, including zsh-4.3.10 and the /bin/sh
+		# from SunOS 5.11, OpenBSD 4.7 and Irix 5.x and 6.5.
+		# If enabling verbose output this way would cause trouble, simply
+		# issue a warning and refrain.
+		if $gl_set_x_corrupts_stderr_; then
+			warn_ "using SHELL=$SHELL with 'set -x' corrupts stderr"
+		else
+			set -x
+		fi
+	fi
 
-  initial_cwd_=$PWD
+	initial_cwd_=$PWD
 
-  pfx_=`testdir_prefix_`
-  test_dir_=`mktempd_ "$initial_cwd_" "$pfx_-$ME_.XXXX"` \
-    || fail_ "failed to create temporary directory in $initial_cwd_"
-  cd "$test_dir_" || fail_ "failed to cd to temporary directory"
+	pfx_=$(testdir_prefix_)
+	test_dir_=$(mktempd_ "$initial_cwd_" "$pfx_-$ME_.XXXX") \
+		|| fail_ "failed to create temporary directory in $initial_cwd_"
+	cd "$test_dir_" || fail_ "failed to cd to temporary directory"
 
-  # As autoconf-generated configure scripts do, ensure that IFS
-  # is defined initially, so that saving and restoring $IFS works.
-  gl_init_sh_nl_='
+	# As autoconf-generated configure scripts do, ensure that IFS
+	# is defined initially, so that saving and restoring $IFS works.
+	gl_init_sh_nl_='
 '
-  IFS=" ""	$gl_init_sh_nl_"
+	IFS=" ""	$gl_init_sh_nl_"
 
-  # This trap statement, along with a trap on 0 below, ensure that the
-  # temporary directory, $test_dir_, is removed upon exit as well as
-  # upon receipt of any of the listed signals.
-  for sig_ in 1 2 3 13 15; do
-    eval "trap 'Exit $(expr $sig_ + 128)' $sig_"
-  done
+	# This trap statement, along with a trap on 0 below, ensure that the
+	# temporary directory, $test_dir_, is removed upon exit as well as
+	# upon receipt of any of the listed signals.
+	for sig_ in 1 2 3 13 15; do
+		eval "trap 'Exit $(expr $sig_ + 128)' $sig_"
+	done
 }
 
 # Create a temporary directory, much like mktemp -d does.
@@ -508,107 +536,114 @@ setup_ ()
 #  - make only $MAX_TRIES_ attempts
 
 # Helper function.  Print $N pseudo-random bytes from a-zA-Z0-9.
-rand_bytes_ ()
-{
-  n_=$1
+rand_bytes_() {
+	n_=$1
 
-  # Maybe try openssl rand -base64 $n_prime_|tr '+/=\012' abcd first?
-  # But if they have openssl, they probably have mktemp, too.
+	# Maybe try openssl rand -base64 $n_prime_|tr '+/=\012' abcd first?
+	# But if they have openssl, they probably have mktemp, too.
 
-  chars_=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
-  dev_rand_=/dev/urandom
-  if test -r "$dev_rand_"; then
-    # Note: 256-length($chars_) == 194; 3 copies of $chars_ is 186 + 8 = 194.
-    dd ibs=$n_ count=1 if=$dev_rand_ 2>/dev/null \
-      | LC_ALL=C tr -c $chars_ 01234567$chars_$chars_$chars_
-    return
-  fi
+	chars_=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+	dev_rand_=/dev/urandom
+	if test -r "$dev_rand_"; then
+		# Note: 256-length($chars_) == 194; 3 copies of $chars_ is 186 + 8 = 194.
+		dd ibs=$n_ count=1 if=$dev_rand_ 2> /dev/null \
+			| LC_ALL=C tr -c $chars_ 01234567$chars_$chars_$chars_
+		return
+	fi
 
-  n_plus_50_=`expr $n_ + 50`
-  cmds_='date; date +%N; free; who -a; w; ps auxww; ps ef; netstat -n'
-  data_=` (eval "$cmds_") 2>&1 | gzip `
+	n_plus_50_=$(expr $n_ + 50)
+	cmds_='date; date +%N; free; who -a; w; ps auxww; ps ef; netstat -n'
+	data_=$( (eval "$cmds_") 2>&1 | gzip)
 
-  # Ensure that $data_ has length at least 50+$n_
-  while :; do
-    len_=`echo "$data_"|wc -c`
-    test $n_plus_50_ -le $len_ && break;
-    data_=` (echo "$data_"; eval "$cmds_") 2>&1 | gzip `
-  done
+	# Ensure that $data_ has length at least 50+$n_
+	while :; do
+		len_=$(echo "$data_" | wc -c)
+		test $n_plus_50_ -le $len_ && break
+		data_=$( (
+			echo "$data_"
+			eval "$cmds_"
+		) 2>&1 | gzip)
+	done
 
-  echo "$data_" \
-    | dd bs=1 skip=50 count=$n_ 2>/dev/null \
-    | LC_ALL=C tr -c $chars_ 01234567$chars_$chars_$chars_
+	echo "$data_" \
+		| dd bs=1 skip=50 count=$n_ 2> /dev/null \
+		| LC_ALL=C tr -c $chars_ 01234567$chars_$chars_$chars_
 }
 
-mktempd_ ()
-{
-  case $# in
-  2);;
-  *) fail_ "Usage: mktempd_ DIR TEMPLATE";;
-  esac
+mktempd_() {
+	case $# in
+		2) ;;
+		*) fail_ "Usage: mktempd_ DIR TEMPLATE" ;;
+	esac
 
-  destdir_=$1
-  template_=$2
+	destdir_=$1
+	template_=$2
 
-  MAX_TRIES_=4
+	MAX_TRIES_=4
 
-  # Disallow any trailing slash on specified destdir:
-  # it would subvert the post-mktemp "case"-based destdir test.
-  case $destdir_ in
-  / | //) destdir_slash_=$destdir;;
-  */) fail_ "invalid destination dir: remove trailing slash(es)";;
-  *) destdir_slash_=$destdir_/;;
-  esac
+	# Disallow any trailing slash on specified destdir:
+	# it would subvert the post-mktemp "case"-based destdir test.
+	case $destdir_ in
+		/ | //) destdir_slash_=$destdir ;;
+		*/) fail_ "invalid destination dir: remove trailing slash(es)" ;;
+		*) destdir_slash_=$destdir_/ ;;
+	esac
 
-  case $template_ in
-  *XXXX) ;;
-  *) fail_ \
-       "invalid template: $template_ (must have a suffix of at least 4 X's)";;
-  esac
+	case $template_ in
+		*XXXX) ;;
+		*) fail_ \
+			"invalid template: $template_ (must have a suffix of at least 4 X's)" ;;
+	esac
 
-  # First, try to use mktemp.
-  d=`unset TMPDIR; { mktemp -d -t -p "$destdir_" "$template_"; } 2>/dev/null` &&
+	# First, try to use mktemp.
+	d=$(
+		unset TMPDIR
+		{ mktemp -d -t -p "$destdir_" "$template_"; } 2> /dev/null
+	) \
+		&&
+		# The resulting name must be in the specified directory.
+		case $d in "$destdir_slash_"*) : ;; *) false ;; esac \
+		&&
+		# It must have created the directory.
+		test -d "$d" \
+		&&
+		# It must have 0700 permissions.  Handle sticky "S" bits.
+		perms=$(ls -dgo "$d" 2> /dev/null) \
+		&& case $perms in drwx--[-S]---*) : ;; *) false ;; esac && {
+		echo "$d"
+		return
+	}
 
-  # The resulting name must be in the specified directory.
-  case $d in "$destdir_slash_"*) :;; *) false;; esac &&
+	# If we reach this point, we'll have to create a directory manually.
 
-  # It must have created the directory.
-  test -d "$d" &&
+	# Get a copy of the template without its suffix of X's.
+	base_template_=$(echo "$template_" | sed 's/XX*$//')
 
-  # It must have 0700 permissions.  Handle sticky "S" bits.
-  perms=`ls -dgo "$d" 2>/dev/null` &&
-  case $perms in drwx--[-S]---*) :;; *) false;; esac && {
-    echo "$d"
-    return
-  }
+	# Calculate how many X's we've just removed.
+	template_length_=$(echo "$template_" | wc -c)
+	nx_=$(echo "$base_template_" | wc -c)
+	nx_=$(expr $template_length_ - $nx_)
 
-  # If we reach this point, we'll have to create a directory manually.
-
-  # Get a copy of the template without its suffix of X's.
-  base_template_=`echo "$template_"|sed 's/XX*$//'`
-
-  # Calculate how many X's we've just removed.
-  template_length_=`echo "$template_" | wc -c`
-  nx_=`echo "$base_template_" | wc -c`
-  nx_=`expr $template_length_ - $nx_`
-
-  err_=
-  i_=1
-  while :; do
-    X_=`rand_bytes_ $nx_`
-    candidate_dir_="$destdir_slash_$base_template_$X_"
-    err_=`mkdir -m 0700 "$candidate_dir_" 2>&1` \
-      && { echo "$candidate_dir_"; return; }
-    test $MAX_TRIES_ -le $i_ && break;
-    i_=`expr $i_ + 1`
-  done
-  fail_ "$err_"
+	err_=
+	i_=1
+	while :; do
+		X_=$(rand_bytes_ $nx_)
+		candidate_dir_="$destdir_slash_$base_template_$X_"
+		err_=$(mkdir -m 0700 "$candidate_dir_" 2>&1) \
+			&& {
+				echo "$candidate_dir_"
+				return
+			}
+		test $MAX_TRIES_ -le $i_ && break
+		i_=$(expr $i_ + 1)
+	done
+	fail_ "$err_"
 }
 
 # If you want to override the testdir_prefix_ function,
 # or to add more utility functions, use this file.
 test -f "$srcdir/init.cfg" \
-  && . "$srcdir/init.cfg"
+	&& . "$srcdir/init.cfg"
 
 setup_ "$@"
 # This trap is here, rather than in the setup_ function, because some

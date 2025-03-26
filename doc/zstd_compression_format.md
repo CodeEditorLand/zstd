@@ -53,9 +53,9 @@ written in portable C, and available at : https://github.com/facebook/zstd .
 
 In this document:
 
--   square brackets i.e. `[` and `]` are used to indicate optional fields or
-    parameters.
--   the naming convention for identifiers is `Mixed_Case_With_Underscores`
+- square brackets i.e. `[` and `]` are used to indicate optional fields or
+  parameters.
+- the naming convention for identifiers is `Mixed_Case_With_Underscores`
 
 ### Definitions
 
@@ -72,17 +72,17 @@ without waiting for its successor, allowing streaming operations.
 
 ## Overview
 
--   [Frames](#frames)
-    -   [Zstandard frames](#zstandard-frames)
-        -   [Blocks](#blocks)
-            -   [Literals Section](#literals-section)
-            -   [Sequences Section](#sequences-section)
-            -   [Sequence Execution](#sequence-execution)
-    -   [Skippable frames](#skippable-frames)
--   [Entropy Encoding](#entropy-encoding)
-    -   [FSE](#fse)
-    -   [Huffman Coding](#huffman-coding)
--   [Dictionary Format](#dictionary-format)
+- [Frames](#frames)
+    - [Zstandard frames](#zstandard-frames)
+        - [Blocks](#blocks)
+            - [Literals Section](#literals-section)
+            - [Sequences Section](#sequences-section)
+            - [Sequence Execution](#sequence-execution)
+    - [Skippable frames](#skippable-frames)
+- [Entropy Encoding](#entropy-encoding)
+    - [FSE](#fse)
+    - [Huffman Coding](#huffman-coding)
+- [Dictionary Format](#dictionary-format)
 
 ## Frames
 
@@ -332,22 +332,22 @@ of `Block_Size`. There are 4 block types :
 | ------------ | ----------- | ----------- | ------------------ | ---------- |
 | `Block_Type` | `Raw_Block` | `RLE_Block` | `Compressed_Block` | `Reserved` |
 
--   `Raw_Block` - this is an uncompressed block. `Block_Content` contains
-    `Block_Size` bytes.
+- `Raw_Block` - this is an uncompressed block. `Block_Content` contains
+  `Block_Size` bytes.
 
--   `RLE_Block` - this is a single byte, repeated `Block_Size` times.
-    `Block_Content` consists of a single byte. On the decompression side, this
-    byte must be repeated `Block_Size` times.
+- `RLE_Block` - this is a single byte, repeated `Block_Size` times.
+  `Block_Content` consists of a single byte. On the decompression side, this
+  byte must be repeated `Block_Size` times.
 
--   `Compressed_Block` - this is a
-    [Zstandard compressed block](#compressed-blocks), explained later on.
-    `Block_Size` is the length of `Block_Content`, the compressed data. The
-    decompressed size is not known, but its maximum possible value is guaranteed
-    (see below)
+- `Compressed_Block` - this is a
+  [Zstandard compressed block](#compressed-blocks), explained later on.
+  `Block_Size` is the length of `Block_Content`, the compressed data. The
+  decompressed size is not known, but its maximum possible value is guaranteed
+  (see below)
 
--   `Reserved` - this is not a block. This value cannot be used with current
-    version of this specification. If such a value is present, it is considered
-    corrupted data.
+- `Reserved` - this is not a block. This value cannot be used with current
+  version of this specification. If such a value is present, it is considered
+  corrupted data.
 
 **`Block_Size`**
 
@@ -366,8 +366,8 @@ When `Block_Type` is `RLE_Block`, since `Block_Content`’s size is always 1,
 The size of `Block_Content` is limited by `Block_Maximum_Size`, which is the
 smallest of:
 
--   `Window_Size`
--   128 KB
+- `Window_Size`
+- 128 KB
 
 `Block_Maximum_Size` is constant for a given frame. This maximum is applicable
 to both the decompressed size and the compressed size of any block in the frame.
@@ -384,8 +384,8 @@ To decompress a compressed block, the compressed size must be provided from
 
 A compressed block consists of 2 sections :
 
--   [Literals Section](#literals-section)
--   [Sequences Section](#sequences-section)
+- [Literals Section](#literals-section)
+- [Sequences Section](#sequences-section)
 
 The results of the two sections are then combined to produce the decompressed
 data in [Sequence Execution](#sequence-execution)
@@ -394,23 +394,23 @@ data in [Sequence Execution](#sequence-execution)
 
 To decode a compressed block, the following elements are necessary :
 
--   Previous decoded data, up to a distance of `Window_Size`, or beginning of
-    the Frame, whichever is smaller.
--   List of "recent offsets" from previous `Compressed_Block`.
--   The previous Huffman tree, required by `Treeless_Literals_Block` type
--   Previous FSE decoding tables, required by `Repeat_Mode` for each symbol type
-    (literals lengths, match lengths, offsets)
+- Previous decoded data, up to a distance of `Window_Size`, or beginning of the
+  Frame, whichever is smaller.
+- List of "recent offsets" from previous `Compressed_Block`.
+- The previous Huffman tree, required by `Treeless_Literals_Block` type
+- Previous FSE decoding tables, required by `Repeat_Mode` for each symbol type
+  (literals lengths, match lengths, offsets)
 
 Note that decoding tables aren't always from the previous `Compressed_Block`.
 
--   Every decoding table can come from a dictionary.
--   The Huffman tree comes from the previous `Compressed_Literals_Block`.
+- Every decoding table can come from a dictionary.
+- The Huffman tree comes from the previous `Compressed_Literals_Block`.
 
 ## Literals Section
 
 All literals are regrouped in the first part of the block. They can be decoded
-first, and then copied during [Sequence Execution], or they can be decoded on the
-flow during [Sequence Execution].
+first, and then copied during [Sequence Execution], or they can be decoded on
+the flow during [Sequence Execution].
 
 Literals can be stored uncompressed or compressed using Huffman prefix codes.
 When compressed, a tree description may optionally be present, followed by 1 or
@@ -443,29 +443,28 @@ This field uses 2 lowest bits of first byte, describing 4 different block types
 | `Compressed_Literals_Block` | 2     |
 | `Treeless_Literals_Block`   | 3     |
 
--   `Raw_Literals_Block` - Literals are stored uncompressed.
--   `RLE_Literals_Block` - Literals consist of a single byte value repeated
-    `Regenerated_Size` times.
--   `Compressed_Literals_Block` - This is a standard Huffman-compressed block,
-    starting with a Huffman tree description. In this mode, there are at least 2
-    different literals represented in the Huffman tree description. See details
-    below.
--   `Treeless_Literals_Block` - This is a Huffman-compressed block, using
-    Huffman tree _from previous Huffman-compressed literals block_.
-    `Huffman_Tree_Description` will be skipped. Note: If this mode is triggered
-    without any previous Huffman-table in the frame (or
-    [dictionary](#dictionary-format)), this should be treated as data
-    corruption.
+- `Raw_Literals_Block` - Literals are stored uncompressed.
+- `RLE_Literals_Block` - Literals consist of a single byte value repeated
+  `Regenerated_Size` times.
+- `Compressed_Literals_Block` - This is a standard Huffman-compressed block,
+  starting with a Huffman tree description. In this mode, there are at least 2
+  different literals represented in the Huffman tree description. See details
+  below.
+- `Treeless_Literals_Block` - This is a Huffman-compressed block, using Huffman
+  tree _from previous Huffman-compressed literals block_.
+  `Huffman_Tree_Description` will be skipped. Note: If this mode is triggered
+  without any previous Huffman-table in the frame (or
+  [dictionary](#dictionary-format)), this should be treated as data corruption.
 
 **`Size_Format`**
 
 `Size_Format` is divided into 2 families :
 
--   For `Raw_Literals_Block` and `RLE_Literals_Block`, it's only necessary to
-    decode `Regenerated_Size`. There is no `Compressed_Size` field.
--   For `Compressed_Block` and `Treeless_Literals_Block`, it's required to
-    decode both `Compressed_Size` and `Regenerated_Size` (the decompressed
-    size). It's also necessary to decode the number of streams (1 or 4).
+- For `Raw_Literals_Block` and `RLE_Literals_Block`, it's only necessary to
+  decode `Regenerated_Size`. There is no `Compressed_Size` field.
+- For `Compressed_Block` and `Treeless_Literals_Block`, it's required to decode
+  both `Compressed_Size` and `Regenerated_Size` (the decompressed size). It's
+  also necessary to decode the number of streams (1 or 4).
 
 For values spanning several bytes, convention is **little-endian**.
 
@@ -474,15 +473,15 @@ For values spanning several bytes, convention is **little-endian**.
 `Size_Format` uses 1 _or_ 2 bits. Its value is :
 `Size_Format = (Literals_Section_Header[0]>>2) & 3`
 
--   `Size_Format` == 00 or 10 : `Size_Format` uses 1 bit. `Regenerated_Size`
-    uses 5 bits (0-31). `Literals_Section_Header` uses 1 byte.
-    `Regenerated_Size = Literals_Section_Header[0]>>3`
--   `Size_Format` == 01 : `Size_Format` uses 2 bits. `Regenerated_Size` uses 12
-    bits (0-4095). `Literals_Section_Header` uses 2 bytes.
-    `Regenerated_Size = (Literals_Section_Header[0]>>4) + (Literals_Section_Header[1]<<4)`
--   `Size_Format` == 11 : `Size_Format` uses 2 bits. `Regenerated_Size` uses 20
-    bits (0-1048575). `Literals_Section_Header` uses 3 bytes.
-    `Regenerated_Size = (Literals_Section_Header[0]>>4) + (Literals_Section_Header[1]<<4) + (Literals_Section_Header[2]<<12)`
+- `Size_Format` == 00 or 10 : `Size_Format` uses 1 bit. `Regenerated_Size` uses
+  5 bits (0-31). `Literals_Section_Header` uses 1 byte.
+  `Regenerated_Size = Literals_Section_Header[0]>>3`
+- `Size_Format` == 01 : `Size_Format` uses 2 bits. `Regenerated_Size` uses 12
+  bits (0-4095). `Literals_Section_Header` uses 2 bytes.
+  `Regenerated_Size = (Literals_Section_Header[0]>>4) + (Literals_Section_Header[1]<<4)`
+- `Size_Format` == 11 : `Size_Format` uses 2 bits. `Regenerated_Size` uses 20
+  bits (0-1048575). `Literals_Section_Header` uses 3 bytes.
+  `Regenerated_Size = (Literals_Section_Header[0]>>4) + (Literals_Section_Header[1]<<4) + (Literals_Section_Header[2]<<12)`
 
 Only Stream1 is present for these cases. Note : it's allowed to represent a
 short value (for example `27`) using a long format, even if it's less efficient.
@@ -492,18 +491,15 @@ short value (for example `27`) using a long format, even if it's less efficient.
 
 `Size_Format` always uses 2 bits.
 
--   `Size_Format` == 00 : _A single stream_. Both `Regenerated_Size` and
-    `Compressed_Size` use 10 bits (0-1023). `Literals_Section_Header` uses 3
-    bytes.
--   `Size_Format` == 01 : 4 streams. Both `Regenerated_Size` and
-    `Compressed_Size` use 10 bits (6-1023). `Literals_Section_Header` uses 3
-    bytes.
--   `Size_Format` == 10 : 4 streams. Both `Regenerated_Size` and
-    `Compressed_Size` use 14 bits (6-16383). `Literals_Section_Header` uses 4
-    bytes.
--   `Size_Format` == 11 : 4 streams. Both `Regenerated_Size` and
-    `Compressed_Size` use 18 bits (6-262143). `Literals_Section_Header` uses 5
-    bytes.
+- `Size_Format` == 00 : _A single stream_. Both `Regenerated_Size` and
+  `Compressed_Size` use 10 bits (0-1023). `Literals_Section_Header` uses 3
+  bytes.
+- `Size_Format` == 01 : 4 streams. Both `Regenerated_Size` and `Compressed_Size`
+  use 10 bits (6-1023). `Literals_Section_Header` uses 3 bytes.
+- `Size_Format` == 10 : 4 streams. Both `Regenerated_Size` and `Compressed_Size`
+  use 14 bits (6-16383). `Literals_Section_Header` uses 4 bytes.
+- `Size_Format` == 11 : 4 streams. Both `Regenerated_Size` and `Compressed_Size`
+  use 18 bits (6-262143). `Literals_Section_Header` uses 5 bytes.
 
 Both `Compressed_Size` and `Regenerated_Size` fields follow **little-endian**
 convention. Note: `Compressed_Size` **includes** the size of the Huffman Tree
@@ -615,19 +611,19 @@ deduced from the size of `Literals_Section`:
 
 Consists of 2 items:
 
--   `Number_of_Sequences`
--   Symbol compression modes
+- `Number_of_Sequences`
+- Symbol compression modes
 
 **`Number_of_Sequences`**
 
 This is a variable size field using between 1 and 3 bytes. Let's call its first
 byte `byte0`.
 
--   `if (byte0 < 128)` : `Number_of_Sequences = byte0` . Uses 1 byte.
--   `if (byte0 < 255)` : `Number_of_Sequences = ((byte0 - 0x80) << 8) + byte1`.
-    Uses 2 bytes. Note that the 2 bytes format fully overlaps the 1 byte format.
--   `if (byte0 == 255)`: `Number_of_Sequences = byte1 + (byte2<<8) + 0x7F00`.
-    Uses 3 bytes.
+- `if (byte0 < 128)` : `Number_of_Sequences = byte0` . Uses 1 byte.
+- `if (byte0 < 255)` : `Number_of_Sequences = ((byte0 - 0x80) << 8) + byte1`.
+  Uses 2 bytes. Note that the 2 bytes format fully overlaps the 1 byte format.
+- `if (byte0 == 255)`: `Number_of_Sequences = byte1 + (byte2<<8) + 0x7F00`. Uses
+  3 bytes.
 
 `if (Number_of_Sequences == 0)` : there are no sequences. The sequence section
 stops immediately, FSE tables used in `Repeat_Mode` aren't updated. Block's
@@ -653,27 +649,27 @@ They follow the same enumeration :
 | ------------------ | ----------------- | ---------- | --------------------- | ------------- |
 | `Compression_Mode` | `Predefined_Mode` | `RLE_Mode` | `FSE_Compressed_Mode` | `Repeat_Mode` |
 
--   `Predefined_Mode` : A predefined FSE distribution table is used, defined in
-    [default distributions](#default-distributions). No distribution table will
-    be present.
--   `RLE_Mode` : The table description consists of a single byte, which contains
-    the symbol's value. This symbol will be used for all sequences.
--   `FSE_Compressed_Mode` : standard FSE compression. A distribution table will
-    be present. The format of this distribution table is described in
-    [FSE Table Description](#fse-table-description). Note that the maximum
-    allowed accuracy log for literals length and match length tables is 9, and
-    the maximum accuracy log for the offsets table is 8. `FSE_Compressed_Mode`
-    must not be used when only one symbol is present, `RLE_Mode` should be used
-    instead (although any other mode will work).
--   `Repeat_Mode` : The table used in the previous `Compressed_Block` with
-    `Number_of_Sequences > 0` will be used again, or if this is the first block,
-    table in the dictionary will be used. Note that this includes `RLE_mode`, so
-    if `Repeat_Mode` follows `RLE_Mode`, the same symbol will be repeated. It
-    also includes `Predefined_Mode`, in which case `Repeat_Mode` will have same
-    outcome as `Predefined_Mode`. No distribution table will be present. If this
-    mode is used without any previous sequence table in the frame (nor
-    [dictionary](#dictionary-format)) to repeat, this should be treated as
-    corruption.
+- `Predefined_Mode` : A predefined FSE distribution table is used, defined in
+  [default distributions](#default-distributions). No distribution table will be
+  present.
+- `RLE_Mode` : The table description consists of a single byte, which contains
+  the symbol's value. This symbol will be used for all sequences.
+- `FSE_Compressed_Mode` : standard FSE compression. A distribution table will be
+  present. The format of this distribution table is described in
+  [FSE Table Description](#fse-table-description). Note that the maximum allowed
+  accuracy log for literals length and match length tables is 9, and the maximum
+  accuracy log for the offsets table is 8. `FSE_Compressed_Mode` must not be
+  used when only one symbol is present, `RLE_Mode` should be used instead
+  (although any other mode will work).
+- `Repeat_Mode` : The table used in the previous `Compressed_Block` with
+  `Number_of_Sequences > 0` will be used again, or if this is the first block,
+  table in the dictionary will be used. Note that this includes `RLE_mode`, so
+  if `Repeat_Mode` follows `RLE_Mode`, the same symbol will be repeated. It also
+  includes `Predefined_Mode`, in which case `Repeat_Mode` will have same outcome
+  as `Predefined_Mode`. No distribution table will be present. If this mode is
+  used without any previous sequence table in the frame (nor
+  [dictionary](#dictionary-format)) to repeat, this should be treated as
+  corruption.
 
 #### The codes for literals lengths, match lengths, and offsets.
 
@@ -807,8 +803,8 @@ ending with the first.
 
 For each of the symbol types, the FSE state can be used to determine the
 appropriate code. The code then defines the `Baseline` and `Number_of_Bits` to
-read for each type. See the [description of the codes] for how to determine these
-values.
+read for each type. See the [description of the codes] for how to determine
+these values.
 
 [description of the codes]:
 	#the-codes-for-literals-lengths-match-lengths-and-offsets
@@ -1008,83 +1004,78 @@ compress Huffman headers.
 
 <<<<<<< HEAD
 
-FSE
----
-FSE, short for Finite State Entropy, is an entropy codec based on [ANS].
-FSE encoding/decoding involves a state that is carried over between symbols.
-Decoding must be done in the opposite direction as encoding.
-Therefore, all FSE bitstreams are read from end to beginning.
-Note that the order of the bits in the stream is not reversed,
-we just read each multi-bits element in the reverse order they are encoded.
-=======
+## FSE
+
 FSE, short for Finite State Entropy, is an entropy codec based on [ANS]. FSE
-encoding/decoding involves a state that is carried over between symbols, so
-decoding must be done in the opposite direction as encoding. Therefore, all FSE
+encoding/decoding involves a state that is carried over between symbols.
+Decoding must be done in the opposite direction as encoding. Therefore, all FSE
 bitstreams are read from end to beginning. Note that the order of the bits in
-the stream is not reversed, we just read the elements in the reverse order they
-are written.
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
+the stream is not reversed, we just read each multi-bits element in the reverse
+order they are encoded. ======= FSE, short for Finite State Entropy, is an
+entropy codec based on [ANS]. FSE encoding/decoding involves a state that is
+carried over between symbols, so decoding must be done in the opposite direction
+as encoding. Therefore, all FSE bitstreams are read from end to beginning. Note
+that the order of the bits in the stream is not reversed, we just read the
+elements in the reverse order they are written.
+
+> > > > > > > 037abb476563f4a9926392ddf7fe62db27171149
 
 For additional details on FSE, see [Finite State Entropy].
 
 [Finite State Entropy]: https://github.com/Cyan4973/FiniteStateEntropy/
 
-<<<<<<< HEAD
-FSE decoding is directed by a decoding table with a power of 2 size, each row containing three elements:
-`Symbol`, `Num_Bits`, and `Baseline`.
-The `log2` of the table size is its `Accuracy_Log`.
-An FSE state value represents an index in this table.
+<<<<<<< HEAD FSE decoding is directed by a decoding table with a power of 2
+size, each row containing three elements: `Symbol`, `Num_Bits`, and `Baseline`.
+The `log2` of the table size is its `Accuracy_Log`. An FSE state value
+represents an index in this table.
 
-To obtain the initial state value, consume `Accuracy_Log` bits from the stream as a __little-endian__ value.
-The first symbol in the stream is the `Symbol` indicated in the table for that state.
-To obtain the next state value,
-the decoder should consume `Num_Bits` bits from the stream as a __little-endian__ value and add it to `Baseline`.
-=======
-FSE decoding involves a decoding table which has a power of 2 size, and contain
-three elements: `Symbol`, `Num_Bits`, and `Baseline`. The `log2` of the table
-size is its `Accuracy_Log`. An FSE state value represents an index in this
-table.
+To obtain the initial state value, consume `Accuracy_Log` bits from the stream
+as a **little-endian** value. The first symbol in the stream is the `Symbol`
+indicated in the table for that state. To obtain the next state value, the
+decoder should consume `Num_Bits` bits from the stream as a **little-endian**
+value and add it to `Baseline`. ======= FSE decoding involves a decoding table
+which has a power of 2 size, and contain three elements: `Symbol`, `Num_Bits`,
+and `Baseline`. The `log2` of the table size is its `Accuracy_Log`. An FSE state
+value represents an index in this table.
 
 To obtain the initial state value, consume `Accuracy_Log` bits from the stream
 as a **little-endian** value. The next symbol in the stream is the `Symbol`
 indicated in the table for that state. To obtain the next state value, the
 decoder should consume `Num_Bits` bits from the stream as a **little-endian**
 value and add it to `Baseline`.
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
+
+> > > > > > > 037abb476563f4a9926392ddf7fe62db27171149
 
 [ANS]: https://en.wikipedia.org/wiki/Asymmetric_Numeral_Systems
 
 ### FSE Table Description
-<<<<<<< HEAD
-To decode an FSE bitstream, it is necessary to build its FSE decoding table.
-The decoding table is derived from a distribution of Probabilities.
-The Zstandard format encodes distributions of Probabilities as follows:
 
-The distribution of probabilities is described in a bitstream which is read forward,
-in __little-endian__ fashion.
-The amount of bytes consumed from the bitstream to describe the distribution
-is discovered at the end of the decoding process.
+<<<<<<< HEAD To decode an FSE bitstream, it is necessary to build its FSE
+decoding table. The decoding table is derived from a distribution of
+Probabilities. The Zstandard format encodes distributions of Probabilities as
+follows:
+
+The distribution of probabilities is described in a bitstream which is read
+forward, in **little-endian** fashion. The amount of bytes consumed from the
+bitstream to describe the distribution is discovered at the end of the decoding
+process.
 
 The bitstream starts by reporting on which scale the distribution operates.
 Let's `low4Bits` designate the lowest 4 bits of the first byte :
 `Accuracy_Log = low4bits + 5`.
 
-An FSE distribution table describes the probabilities of all symbols
-from `0` to the last present one (included) in natural order.
-The sum of probabilities is normalized to reach a power of 2 total of `1 << Accuracy_Log` .
-There must be two or more symbols with non-zero probabilities.
+An FSE distribution table describes the probabilities of all symbols from `0` to
+the last present one (included) in natural order. The sum of probabilities is
+normalized to reach a power of 2 total of `1 << Accuracy_Log` . There must be
+two or more symbols with non-zero probabilities.
 
-The number of bits used to decode each probability is variable.
-It depends on :
+The number of bits used to decode each probability is variable. It depends on :
 
-- Remaining probabilities + 1 :
-  __example__ :
-  Presuming an `Accuracy_Log` of 8,
-  and presuming 100 probability points have already been distributed,
-  the decoder may read any value from `0` to `256 - 100 + 1 == 157` (inclusive).
-  Therefore, it may read up to `log2sup(157) == 8` bits, where `log2sup(N)`
-  is the smallest integer `T` that satisfies `(1 << T) > N`.
-=======
+- Remaining probabilities + 1 : **example** : Presuming an `Accuracy_Log` of 8,
+  and presuming 100 probability points have already been distributed, the
+  decoder may read any value from `0` to `256 - 100 + 1 == 157` (inclusive).
+  Therefore, it may read up to `log2sup(157) == 8` bits, where `log2sup(N)` is
+  the smallest integer `T` that satisfies `(1 << T) > N`. =======
 
 To decode FSE streams, it is necessary to construct the decoding table. The
 Zstandard format encodes FSE table descriptions as follows:
@@ -1103,78 +1094,70 @@ designate the lowest 4 bits of the first byte : `Accuracy_Log = low4bits + 5`.
 Then follows each symbol value, from `0` to last present one. The number of bits
 used by each field is variable. It depends on :
 
--   Remaining probabilities + 1 : **example** : Presuming an `Accuracy_Log` of
-    8, and presuming 100 probabilities points have already been distributed, the
-    decoder may read any value from `0` to `256 - 100 + 1 == 157` (inclusive).
-    Therefore, it may read up to `log2sup(157) == 8` bits, where `log2sup(N)` is
-    the smallest integer `T` that satisfies `(1 << T) > N`.
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
+- Remaining probabilities + 1 : **example** : Presuming an `Accuracy_Log` of 8,
+  and presuming 100 probabilities points have already been distributed, the
+  decoder may read any value from `0` to `256 - 100 + 1 == 157` (inclusive).
+  Therefore, it may read up to `log2sup(157) == 8` bits, where `log2sup(N)` is
+  the smallest integer `T` that satisfies `(1 << T) > N`.
 
--   Value decoded : small values use 1 less bit : **example** : Presuming values
-    from 0 to 157 (inclusive) are possible, 255-157 = 98 values are remaining in
-    an 8-bits field. They are used this way : first 98 values (hence from 0
-    to 97) use only 7 bits, values from 98 to 157 use 8 bits. This is achieved
-    through this scheme :
+    > > > > > > > 037abb476563f4a9926392ddf7fe62db27171149
 
-<<<<<<< HEAD
-  | 8-bit field read | Value decoded | Nb of bits consumed |
-  | ---------------- | ------------- | ------------------- |
-  |         0 -  97  |   0 -  97     |  7                  |
-  |        98 - 127  |  98 - 127     |  8                  |
-  |       128 - 225  |   0 -  97     |  7                  |
-  |       226 - 255  | 128 - 157     |  8                  |
-=======
-    | Value read | Value decoded | Number of bits used |
-    | ---------- | ------------- | ------------------- |
-    | 0 - 97     | 0 - 97        | 7                   |
-    | 98 - 127   | 98 - 127      | 8                   |
-    | 128 - 225  | 0 - 97        | 7                   |
-    | 226 - 255  | 128 - 157     | 8                   |
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
+- Value decoded : small values use 1 less bit : **example** : Presuming values
+  from 0 to 157 (inclusive) are possible, 255-157 = 98 values are remaining in
+  an 8-bits field. They are used this way : first 98 values (hence from 0 to 97)
+  use only 7 bits, values from 98 to 157 use 8 bits. This is achieved through
+  this scheme :
+
+<<<<<<< HEAD | 8-bit field read | Value decoded | Nb of bits consumed | |
+---------------- | ------------- | ------------------- | | 0 - 97 | 0 - 97 | 7 |
+| 98 - 127 | 98 - 127 | 8 | | 128 - 225 | 0 - 97 | 7 | | 226 - 255 | 128 - 157 |
+8 | ======= | Value read | Value decoded | Number of bits used | | ---------- |
+------------- | ------------------- | | 0 - 97 | 0 - 97 | 7 | | 98 - 127 | 98 -
+127 | 8 | | 128 - 225 | 0 - 97 | 7 | | 226 - 255 | 128 - 157 | 8 |
+
+> > > > > > > 037abb476563f4a9926392ddf7fe62db27171149
 
 Probability is derived from Value decoded using the following formula:
 `Probality = Value - 1`
 
 Consequently, a Probability of `0` is described by a Value `1`.
 
-<<<<<<< HEAD
-A Value `0` is used to signal a special case, named "Probability `-1`".
-It describes a probability which should have been "less than 1".
-Its effect on the decoding table building process is described in the [next section].
-For the purpose of counting total allocated probability points, it counts as one.
-=======
-It means value `0` becomes negative probability `-1`. `-1` is a special
-probability, which means "less than 1". Its effect on distribution table is
-described in the [next section]. For the purpose of calculating total allocated probability
-points, it counts as one.
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
+<<<<<<< HEAD A Value `0` is used to signal a special case, named "Probability
+`-1`". It describes a probability which should have been "less than 1". Its
+effect on the decoding table building process is described in the [next
+section]. For the purpose of counting total allocated probability points, it
+counts as one. ======= It means value `0` becomes negative probability `-1`.
+`-1` is a special probability, which means "less than 1". Its effect on
+distribution table is described in the [next section]. For the purpose of
+calculating total allocated probability points, it counts as one.
+
+> > > > > > > 037abb476563f4a9926392ddf7fe62db27171149
 
 [next section]: #from-normalized-distribution-to-decoding-tables
 
-<<<<<<< HEAD
-Symbols probabilities are read one by one, in order.
-After each probability is decoded, the total nb of probability points is updated.
-This is used to determine how many bits must be read to decode the probability of next symbol.
+<<<<<<< HEAD Symbols probabilities are read one by one, in order. After each
+probability is decoded, the total nb of probability points is updated. This is
+used to determine how many bits must be read to decode the probability of next
+symbol.
 
-When a symbol has a __probability__ of `zero` (decoded from reading a Value `1`),
-it is followed by a 2-bits repeat flag.
-This repeat flag tells how many probabilities of zeroes follow the current one.
-It provides a number ranging from 0 to 3.
-If it is a 3, another 2-bits repeat flag follows, and so on.
+When a symbol has a **probability** of `zero` (decoded from reading a Value
+`1`), it is followed by a 2-bits repeat flag. This repeat flag tells how many
+probabilities of zeroes follow the current one. It provides a number ranging
+from 0 to 3. If it is a 3, another 2-bits repeat flag follows, and so on.
 
-When the Probability for a symbol makes cumulated total reach `1 << Accuracy_Log`,
-then it's the last symbol, and decoding is complete.
-=======
-When a symbol has a **probability** of `zero`, it is followed by a 2-bits repeat
-flag. This repeat flag tells how many probabilities of zeroes follow the current
-one. It provides a number ranging from 0 to 3. If it is a 3, another 2-bits
-repeat flag follows, and so on.
+When the Probability for a symbol makes cumulated total reach
+`1 << Accuracy_Log`, then it's the last symbol, and decoding is complete.
+======= When a symbol has a **probability** of `zero`, it is followed by a
+2-bits repeat flag. This repeat flag tells how many probabilities of zeroes
+follow the current one. It provides a number ranging from 0 to 3. If it is a 3,
+another 2-bits repeat flag follows, and so on.
 
 When last symbol reaches cumulated total of `1 << Accuracy_Log`, decoding is
 complete. If this process results in a non-zero probability for a value outside
 of the valid range of values that the FSE table is defined for, even if that
 value is not used, then the data is considered corrupted.
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
+
+> > > > > > > 037abb476563f4a9926392ddf7fe62db27171149
 
 Then the decoder can tell how many bytes were used in this process, and how many
 symbols are present. The bitstream consumes a round number of bytes. Any
@@ -1182,35 +1165,30 @@ remaining bit within the last byte is just unused.
 
 If this process results in a non-zero probability for a symbol outside of the
 valid range of symbols that the FSE table is defined for, even if that symbol is
-not used, then the data is considered corrupted.
-For the specific case of offset codes,
-a decoder implementation may reject a frame containing a non-zero probability
-for an offset code larger than the largest offset code supported by the decoder
-implementation.
+not used, then the data is considered corrupted. For the specific case of offset
+codes, a decoder implementation may reject a frame containing a non-zero
+probability for an offset code larger than the largest offset code supported by
+the decoder implementation.
 
 #### From normalized distribution to decoding tables
 
-<<<<<<< HEAD
-The normalized distribution of probabilities is enough
-to create a unique decoding table.
-It is generated using the following build rule :
+<<<<<<< HEAD The normalized distribution of probabilities is enough to create a
+unique decoding table. It is generated using the following build rule :
 
-The table has a size of `Table_Size = 1 << Accuracy_Log`.
-Each row specifies the decoded symbol,
-and instructions to reach the next state (`Number_of_Bits` and `Baseline`).
+The table has a size of `Table_Size = 1 << Accuracy_Log`. Each row specifies the
+decoded symbol, and instructions to reach the next state (`Number_of_Bits` and
+`Baseline`).
 
 Symbols are first scanned in their natural order for "less than 1" probabilities
-(previously decoded from a Value of `0`).
-Symbols with this special probability are being attributed a single row,
-starting from the end of the table and retreating.
-These symbols define a full state reset, reading `Accuracy_Log` bits.
+(previously decoded from a Value of `0`). Symbols with this special probability
+are being attributed a single row, starting from the end of the table and
+retreating. These symbols define a full state reset, reading `Accuracy_Log`
+bits.
 
 Then, all remaining symbols, sorted in natural order, are allocated rows.
-Starting from smallest present symbol, and table position `0`,
-each symbol gets allocated as many rows as its probability.
-=======
-The distribution of normalized probabilities is enough to create a unique
-decoding table.
+Starting from smallest present symbol, and table position `0`, each symbol gets
+allocated as many rows as its probability. ======= The distribution of
+normalized probabilities is enough to create a unique decoding table.
 
 It follows the following build rule :
 
@@ -1227,70 +1205,71 @@ Then, all remaining symbols, sorted in natural order, are allocated cells.
 Starting from symbol `0` (if it exists), and table position `0`, each symbol
 gets allocated as many cells as its probability. Cell allocation is spread, not
 linear : each successor position follows this rule :
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
+
+> > > > > > > 037abb476563f4a9926392ddf7fe62db27171149
 
 Row allocation is not linear, it follows this order, in modular arithmetic:
+
 ```
 position += (tableSize>>1) + (tableSize>>3) + 3;
 position &= tableSize-1;
 ```
 
-<<<<<<< HEAD
-Using above ordering rule, each symbol gets allocated as many rows as its probability.
-If a position is already occupied by a "less than 1" probability symbol,
-it is simply skipped, and the next position is allocated instead.
-Once enough rows have been allocated for the current symbol,
-the allocation process continues, using the next symbol, in natural order.
-This process guarantees that the table is entirely and exactly filled.
+<<<<<<< HEAD Using above ordering rule, each symbol gets allocated as many rows
+as its probability. If a position is already occupied by a "less than 1"
+probability symbol, it is simply skipped, and the next position is allocated
+instead. Once enough rows have been allocated for the current symbol, the
+allocation process continues, using the next symbol, in natural order. This
+process guarantees that the table is entirely and exactly filled.
 
-Each row specifies a decoded symbol, and is accessed by current state value.
-It also specifies `Number_of_Bits` and `Baseline`, which are required to determine next state value.
+Each row specifies a decoded symbol, and is accessed by current state value. It
+also specifies `Number_of_Bits` and `Baseline`, which are required to determine
+next state value.
 
-To correctly set these fields, it's necessary to sort all occurrences of each symbol in state value order,
-and then attribute N+1 bits to lower rows, and N bits to higher rows,
-following the process described below (using an example):
+To correctly set these fields, it's necessary to sort all occurrences of each
+symbol in state value order, and then attribute N+1 bits to lower rows, and N
+bits to higher rows, following the process described below (using an example):
 
-__Example__ :
-Presuming an `Accuracy_Log` of 7,
-let's imagine a symbol with a Probability of 5:
-it receives 5 rows, corresponding to 5 state values between `0` and `127`.
+**Example** : Presuming an `Accuracy_Log` of 7, let's imagine a symbol with a
+Probability of 5: it receives 5 rows, corresponding to 5 state values between
+`0` and `127`.
 
-In this example, the first state value happens to be `1` (after unspecified previous symbols).
-The next 4 states are then determined using above modular arithmetic rule,
-which specifies to add `64+16+3 = 83` modulo `128` to jump to next position,
-producing the following series: `1`, `84`, `39`, `122`, `77` (modular arithmetic).
-(note: the next symbol will then start at `32`).
+In this example, the first state value happens to be `1` (after unspecified
+previous symbols). The next 4 states are then determined using above modular
+arithmetic rule, which specifies to add `64+16+3 = 83` modulo `128` to jump to
+next position, producing the following series: `1`, `84`, `39`, `122`, `77`
+(modular arithmetic). (note: the next symbol will then start at `32`).
 
-These state values are then sorted in natural order,
-resulting in the following series: `1`, `39`, `77`, `84`, `122`.
+These state values are then sorted in natural order, resulting in the following
+series: `1`, `39`, `77`, `84`, `122`.
 
-The next power of 2 after 5 is 8.
-Therefore, the probability space will be divided into 8 equal parts.
-Since the probability space is `1<<7 = 128` large, each share is `128/8 = 16` large.
+The next power of 2 after 5 is 8. Therefore, the probability space will be
+divided into 8 equal parts. Since the probability space is `1<<7 = 128` large,
+each share is `128/8 = 16` large.
 
 In order to reach 8 shares, the `8-5 = 3` lowest states will count "double",
 doubling their shares (32 in width), hence requiring one more bit.
 
-Baseline is assigned starting from the lowest state using fewer bits,
-continuing in natural state order, looping back at the beginning.
-Each state takes its allocated range from Baseline, sized by its `Number_of_Bits`.
+Baseline is assigned starting from the lowest state using fewer bits, continuing
+in natural state order, looping back at the beginning. Each state takes its
+allocated range from Baseline, sized by its `Number_of_Bits`.
 
-| state order      |   0   |   1   |    2   |   3  |    4   |
-| ---------------- | ----- | ----- | ------ | ---- | ------ |
-| state value      |   1   |  39   |   77   |  84  |  122   |
-| width            |  32   |  32   |   32   |  16  |   16   |
-| `Number_of_Bits` |   5   |   5   |    5   |   4  |    4   |
-| allocation order |   3   |   4   |    5   |   1  |    2   |
-| `Baseline`       |  32   |  64   |   96   |   0  |   16   |
-| range            | 32-63 | 64-95 | 96-127 | 0-15 | 16-31  |
+| state order      | 0     | 1     | 2      | 3    | 4     |
+| ---------------- | ----- | ----- | ------ | ---- | ----- |
+| state value      | 1     | 39    | 77     | 84   | 122   |
+| width            | 32    | 32    | 32     | 16   | 16    |
+| `Number_of_Bits` | 5     | 5     | 5      | 4    | 4     |
+| allocation order | 3     | 4     | 5      | 1    | 2     |
+| `Baseline`       | 32    | 64    | 96     | 0    | 16    |
+| range            | 32-63 | 64-95 | 96-127 | 0-15 | 16-31 |
 
-During decoding, the next state value is determined by using current state value as row number,
-then reading the required `Number_of_Bits` from the bitstream, and adding the specified `Baseline`.
-=======
-A position is skipped if already occupied by a "less than 1" probability symbol.
-`position` does not reset between symbols, it simply iterates through each
-position in the table, switching to the next symbol when enough states have been
-allocated to the current one.
+During decoding, the next state value is determined by using current state value
+as row number, then reading the required `Number_of_Bits` from the bitstream,
+and adding the specified `Baseline`. ======= A position is skipped if already
+occupied by a "less than 1" probability symbol. `position` does not reset
+between symbols, it simply iterates through each position in the table,
+switching to the next symbol when enough states have been allocated to the
+current one.
 
 The process guarantees that the table is entirely filled. Each cell corresponds
 to a state value, which contains the symbol being decoded.
@@ -1326,13 +1305,15 @@ allocated width from Baseline.
 
 During decoding, the next state value is determined from current state value, by
 reading the required `Number_of_Bits`, and adding the specified `Baseline`.
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
 
-Note:
-as a trivial example, it follows that, for a symbol with a Probability of `1`,
-`Baseline` is necessarily `0`, and `Number_of_Bits` is necessarily `Accuracy_Log`.
+> > > > > > > 037abb476563f4a9926392ddf7fe62db27171149
 
-See [Appendix A] to see the outcome of this process applied to the default distributions.
+Note: as a trivial example, it follows that, for a symbol with a Probability of
+`1`, `Baseline` is necessarily `0`, and `Number_of_Bits` is necessarily
+`Accuracy_Log`.
+
+See [Appendix A] to see the outcome of this process applied to the default
+distributions.
 
 [Appendix A]: #appendix-a---decoding-tables-for-predefined-codes
 
@@ -1370,34 +1351,32 @@ operations. This specification limits maximum code length to 11 bits.
 
 #### Representation
 
-<<<<<<< HEAD
-All literal symbols from zero (included) to last present one (excluded)
-are represented by `Weight` with values from `0` to `Max_Number_of_Bits`.
-=======
-All literal values from zero (included) to last present one (excluded) are
-represented by `Weight` with values from `0` to `Max_Number_of_Bits`.
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
-Transformation from `Weight` to `Number_of_Bits` follows this formula :
+<<<<<<< HEAD All literal symbols from zero (included) to last present one
+(excluded) are represented by `Weight` with values from `0` to
+`Max_Number_of_Bits`. ======= All literal values from zero (included) to last
+present one (excluded) are represented by `Weight` with values from `0` to
+`Max_Number_of_Bits`.
+
+> > > > > > > 037abb476563f4a9926392ddf7fe62db27171149 Transformation from
+> > > > > > > `Weight` to `Number_of_Bits` follows this formula :
 
 ```
 Number_of_Bits = Weight ? (Max_Number_of_Bits + 1 - Weight) : 0
 ```
-<<<<<<< HEAD
-When a literal symbol is not present, it receives a `Weight` of 0.
-The least frequent symbol receives a `Weight` of 1.
-If no literal has a `Weight` of 1, then the data is considered corrupted.
-If there are not at least two literals with non-zero `Weight`, then the data
-is considered corrupted.
-The most frequent symbol receives a `Weight` anywhere between 1 and 11 (max).
-The last symbol's `Weight` is deduced from previously retrieved Weights,
-by completing to the nearest power of 2. It's necessarily non 0.
-If it's not possible to reach a clean power of 2 with a single `Weight` value,
-the Huffman Tree Description is considered invalid.
-This final power of 2 gives `Max_Number_of_Bits`, the depth of the current tree.
-`Max_Number_of_Bits` must be <= 11,
-otherwise the representation is considered corrupted.
-=======
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
+
+<<<<<<< HEAD When a literal symbol is not present, it receives a `Weight` of 0.
+The least frequent symbol receives a `Weight` of 1. If no literal has a `Weight`
+of 1, then the data is considered corrupted. If there are not at least two
+literals with non-zero `Weight`, then the data is considered corrupted. The most
+frequent symbol receives a `Weight` anywhere between 1 and 11 (max). The last
+symbol's `Weight` is deduced from previously retrieved Weights, by completing to
+the nearest power of 2. It's necessarily non 0. If it's not possible to reach a
+clean power of 2 with a single `Weight` value, the Huffman Tree Description is
+considered invalid. This final power of 2 gives `Max_Number_of_Bits`, the depth
+of the current tree. `Max_Number_of_Bits` must be <= 11, otherwise the
+representation is considered corrupted. =======
+
+> > > > > > > 037abb476563f4a9926392ddf7fe62db27171149
 
 When a literal value is not present, it receives a `Weight` of 0. The least
 frequent symbol receives a `Weight` of 1. If no literal has a `Weight` of 1,
@@ -1411,15 +1390,14 @@ considered invalid. This final power of 2 gives `Max_Number_of_Bits`, the depth
 of the current tree. `Max_Number_of_Bits` must be <= 11, otherwise the
 representation is considered corrupted.
 
-<<<<<<< HEAD
-|  literal symbol  |  A  |  B  |  C  |  D  |  E  |  F  |
-=======
-**Example** : Let's presume the following Huffman tree must be described :
+<<<<<<< HEAD | literal symbol | A | B | C | D | E | F | ======= **Example** :
+Let's presume the following Huffman tree must be described :
 
-| literal value    | 0   | 1   | 2   | 3   | 4   | 5   |
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
-| ---------------- | --- | --- | --- | --- | --- | --- |
-| `Number_of_Bits` | 1   | 2   | 3   | 0   | 4   | 4   |
+| literal value | 0 | 1 | 2 | 3 | 4 | 5 |
+
+> > > > > > > 037abb476563f4a9926392ddf7fe62db27171149 | ---------------- | ---
+> > > > > > > | --- | --- | --- | --- | --- | | `Number_of_Bits` | 1 | 2 | 3 | 0
+> > > > > > > | 4 | 4 |
 
 The tree depth is 4, since its longest elements uses 4 bits (longest elements
 are the one with smallest frequency). Literal value `5` will not be listed, as
@@ -1427,36 +1405,37 @@ it can be determined from previous values 0-4, nor will values above `5` as they
 are all 0. Values from `0` to `4` will be listed using `Weight` instead of
 `Number_of_Bits`. Weight formula is :
 
-<<<<<<< HEAD
-The tree depth is 4, since its longest elements uses 4 bits
+<<<<<<< HEAD The tree depth is 4, since its longest elements uses 4 bits
 (longest elements are the ones with smallest frequency).
 
-All symbols will now receive a `Weight` instead of `Number_of_Bits`.
-Weight formula is :
+All symbols will now receive a `Weight` instead of `Number_of_Bits`. Weight
+formula is :
+
 ```
 Weight = Number_of_Bits ? (Max_Number_of_Bits + 1 - Number_of_Bits) : 0
 ```
+
 It gives the following series of Weights :
 
-| literal symbol |  A  |  B  |  C  |  D  |  E  |  F  |
+| literal symbol | A   | B   | C   | D   | E   | F   |
 | -------------- | --- | --- | --- | --- | --- | --- |
-|   `Weight`     |  4  |  3  |  2  |  0  |  1  |  1  |
+| `Weight`       | 4   | 3   | 2   | 0   | 1   | 1   |
 
 This list will be sent to the decoder, with the following modifications:
 
 - `F` will not be listed, because it can be determined from previous symbols
 - nor will symbols above `F` as they are all 0
-- on the other hand, all symbols before `A`, starting with `\0`, will be listed, with a Weight of 0.
+- on the other hand, all symbols before `A`, starting with `\0`, will be listed,
+  with a Weight of 0.
 
-The decoder will do the inverse operation :
-having collected weights of literal symbols from `A` to `E`,
-it knows the last literal, `F`, is present with a non-zero `Weight`.
-The `Weight` of `F` can be determined by advancing to the next power of 2.
-The sum of `2^(Weight-1)` (excluding 0's) is :
-`8 + 4 + 2 + 0 + 1 = 15`.
-Nearest larger power of 2 value is 16.
-Therefore, `Max_Number_of_Bits = log2(16) = 4` and `Weight[F] = log_2(16 - 15) + 1 = 1`.
+The decoder will do the inverse operation : having collected weights of literal
+symbols from `A` to `E`, it knows the last literal, `F`, is present with a
+non-zero `Weight`. The `Weight` of `F` can be determined by advancing to the
+next power of 2. The sum of `2^(Weight-1)` (excluding 0's) is :
+`8 + 4 + 2 + 0 + 1 = 15`. Nearest larger power of 2 value is 16. Therefore,
+`Max_Number_of_Bits = log2(16) = 4` and `Weight[F] = log_2(16 - 15) + 1 = 1`.
 =======
+
 ```
 Weight = Number_of_Bits ? (Max_Number_of_Bits + 1 - Number_of_Bits) : 0
 ```
@@ -1473,35 +1452,36 @@ non-zero `Weight`. The `Weight` of `5` can be determined by advancing to the
 next power of 2. The sum of `2^(Weight-1)` (excluding 0's) is :
 `8 + 4 + 2 + 0 + 1 = 15`. Nearest larger power of 2 value is 16. Therefore,
 `Max_Number_of_Bits = 4` and `Weight[5] = log_2(16 - 15) + 1 = 1`.
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
+
+> > > > > > > 037abb476563f4a9926392ddf7fe62db27171149
 
 #### Huffman Tree header
 
 This is a single byte value (0-255), which describes how the series of weights
 is encoded.
 
--   if `headerByte` < 128 : the series of weights is compressed using FSE (see
-    below). The length of the FSE-compressed series is equal to `headerByte`
-    (0-127).
+- if `headerByte` < 128 : the series of weights is compressed using FSE (see
+  below). The length of the FSE-compressed series is equal to `headerByte`
+  (0-127).
 
--   if `headerByte` >= 128 :
-    -   the series of weights uses a direct representation, where each `Weight`
-        is encoded directly as a 4 bits field (0-15).
-    -   They are encoded forward, 2 weights to a byte, first weight taking the
-        top four bits and second one taking the bottom four.
-        -   e.g. the following operations could be used to read the weights:
-            `Weight[0] = (Byte[0] >> 4), Weight[1] = (Byte[0] & 0xf)`, etc.
-    -   The full representation occupies `Ceiling(Number_of_Weights/2)` bytes,
-        meaning it uses only full bytes even if `Number_of_Weights` is odd.
-    -   `Number_of_Weights = headerByte - 127`.
-        -   Note that maximum `Number_of_Weights` is 255-127 = 128, therefore,
-            only up to 128 `Weight` can be encoded using direct representation.
-        -   Since the last non-zero `Weight` is _not_ encoded, this scheme is
-            compatible with alphabet sizes of up to 129 symbols, hence including
-            literal symbol 128.
-        -   If any literal symbol > 128 has a non-zero `Weight`, direct
-            representation is not possible. In such case, it's necessary to use
-            FSE compression.
+- if `headerByte` >= 128 :
+    - the series of weights uses a direct representation, where each `Weight` is
+      encoded directly as a 4 bits field (0-15).
+    - They are encoded forward, 2 weights to a byte, first weight taking the top
+      four bits and second one taking the bottom four.
+        - e.g. the following operations could be used to read the weights:
+          `Weight[0] = (Byte[0] >> 4), Weight[1] = (Byte[0] & 0xf)`, etc.
+    - The full representation occupies `Ceiling(Number_of_Weights/2)` bytes,
+      meaning it uses only full bytes even if `Number_of_Weights` is odd.
+    - `Number_of_Weights = headerByte - 127`.
+        - Note that maximum `Number_of_Weights` is 255-127 = 128, therefore,
+          only up to 128 `Weight` can be encoded using direct representation.
+        - Since the last non-zero `Weight` is _not_ encoded, this scheme is
+          compatible with alphabet sizes of up to 129 symbols, hence including
+          literal symbol 128.
+        - If any literal symbol > 128 has a non-zero `Weight`, direct
+          representation is not possible. In such case, it's necessary to use
+          FSE compression.
 
 #### Finite State Entropy (FSE) compression of Huffman weights
 
@@ -1509,17 +1489,15 @@ In this case, the series of Huffman weights is compressed using FSE compression.
 It's a single bitstream with 2 interleaved states, sharing a single distribution
 table.
 
-To decode an FSE bitstream, it is necessary to know its compressed size.
-<<<<<<< HEAD
-Compressed size is provided by `headerByte`.
-It's also necessary to know its _maximum possible_ decompressed size,
-which is `255`, since literal symbols span from `0` to `255`,
-and last symbol's `Weight` is not represented.
-=======
+To decode an FSE bitstream, it is necessary to know its compressed size. <<<<<<<
+HEAD Compressed size is provided by `headerByte`. It's also necessary to know
+its _maximum possible_ decompressed size, which is `255`, since literal symbols
+span from `0` to `255`, and last symbol's `Weight` is not represented. =======
 Compressed size is provided by `headerByte`. It's also necessary to know its
 _maximum possible_ decompressed size, which is `255`, since literal values span
 from `0` to `255`, and last symbol's `Weight` is not represented.
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
+
+> > > > > > > 037abb476563f4a9926392ddf7fe62db27171149
 
 An FSE bitstream starts by a header, describing probabilities distribution. It
 will create a Decoding Table. For a list of Huffman weights, the maximum
@@ -1553,18 +1531,15 @@ weights into `Number_of_Bits`, using this formula:
 ```
 Number_of_Bits = (Weight>0) ? Max_Number_of_Bits + 1 - Weight : 0
 ```
-<<<<<<< HEAD
-In order to determine which prefix code is assigned to each Symbol,
-Symbols are first sorted by `Weight`, then by natural sequential order.
-Symbols with a `Weight` of zero are removed.
-Then, starting from lowest `Weight` (hence highest `Number_of_Bits`),
-prefix codes are assigned in ascending order.
 
-__Example__ :
-Let's assume the following list of weights has been decoded:
+<<<<<<< HEAD In order to determine which prefix code is assigned to each Symbol,
+Symbols are first sorted by `Weight`, then by natural sequential order. Symbols
+with a `Weight` of zero are removed. Then, starting from lowest `Weight` (hence
+highest `Number_of_Bits`), prefix codes are assigned in ascending order.
 
-| Literal  |  A  |  B  |  C  |  D  |  E  |  F  |
-=======
+**Example** : Let's assume the following list of weights has been decoded:
+
+# | Literal | A | B | C | D | E | F |
 
 Symbols are sorted by `Weight`. Within same `Weight`, symbols keep natural
 sequential order. Symbols with a `Weight` of zero are removed. Then, starting
@@ -1572,31 +1547,31 @@ from lowest `Weight`, prefix codes are distributed in sequential order.
 
 **Example** : Let's presume the following list of weights has been decoded :
 
-| Literal  | 0   | 1   | 2   | 3   | 4   | 5   |
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
-| -------- | --- | --- | --- | --- | --- | --- |
-| `Weight` | 4   | 3   | 2   | 0   | 1   | 1   |
+| Literal | 0 | 1 | 2 | 3 | 4 | 5 |
 
-<<<<<<< HEAD
-Sorted by weight and then natural sequential order,
-it gives the following prefix codes distribution:
+> > > > > > > 037abb476563f4a9926392ddf7fe62db27171149 | -------- | --- | --- |
+> > > > > > > --- | --- | --- | --- | | `Weight` | 4 | 3 | 2 | 0 | 1 | 1 |
 
-| Literal          |  D  |   E  |   F  |   C  |   B  |   A  |
+<<<<<<< HEAD Sorted by weight and then natural sequential order, it gives the
+following prefix codes distribution:
+
+| Literal          | D   | E    | F    | C    | B    | A    |
 | ---------------- | --- | ---- | ---- | ---- | ---- | ---- |
-| `Weight`         |  0  |   1  |   1  |   2  |   3  |   4  |
-| `Number_of_Bits` |  0  |   4  |   4  |   3  |   2  |   1  |
+| `Weight`         | 0   | 1    | 1    | 2    | 3    | 4    |
+| `Number_of_Bits` | 0   | 4    | 4    | 3    | 2    | 1    |
 | prefix code      | N/A | 0000 | 0001 | 001  | 01   | 1    |
 | ascending order  | N/A | 0000 | 0001 | 001x | 01xx | 1xxx |
-=======
-Sorted by weight and then natural sequential order, it gives the following
-distribution :
+
+======= Sorted by weight and then natural sequential order, it gives the
+following distribution :
 
 | Literal          | 3   | 4    | 5    | 2   | 1   | 0   |
 | ---------------- | --- | ---- | ---- | --- | --- | --- |
 | `Weight`         | 0   | 1    | 1    | 2   | 3   | 4   |
 | `Number_of_Bits` | 0   | 4    | 4    | 3   | 2   | 1   |
 | prefix codes     | N/A | 0000 | 0001 | 001 | 01  | 1   |
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
+
+> > > > > > > 037abb476563f4a9926392ddf7fe62db27171149
 
 ### Huffman-coded Streams
 
@@ -1619,15 +1594,13 @@ forward order.
 For example, if the literal sequence `ABEF` was encoded using above prefix code,
 it would be encoded (in reverse order) as:
 
-<<<<<<< HEAD
-|Symbol  |   F  |   E  |  B | A | Padding |
-|--------|------|------|----|---|---------|
-|Encoding|`0000`|`0001`|`01`|`1`| `00001` |
-=======
-| Symbol   | 5      | 4      | 1    | 0   | Padding |
-| -------- | ------ | ------ | ---- | --- | ------- |
-| Encoding | `0000` | `0001` | `01` | `1` | `00001` |
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
+<<<<<<< HEAD |Symbol | F | E | B | A | Padding |
+|--------|------|------|----|---|---------| |Encoding|`0000`|`0001`|`01`|`1`|
+`00001` | ======= | Symbol | 5 | 4 | 1 | 0 | Padding | | -------- | ------ |
+------ | ---- | --- | ------- | | Encoding | `0000` | `0001` | `01` | `1` |
+`00001` |
+
+> > > > > > > 037abb476563f4a9926392ddf7fe62db27171149
 
 Resulting in following 2-bytes bitstream :
 
@@ -1681,15 +1654,16 @@ future registrar and shall not be used :
 Outside of these ranges, any value of `Dictionary_ID` which is both `>= 32768`
 and `< (1<<31)` can be used freely, even in public environment.
 
-**`Entropy_Tables`** : follow the same format as tables in [compressed blocks]. See
-the relevant [FSE](#fse-table-description) and [Huffman](#huffman-tree-description)
-sections for how to decode these tables. They are stored in following order : Huffman
-tables for literals, FSE table for offsets, FSE table for match lengths, and FSE
-table for literals lengths. These tables populate the Repeat Stats literals mode
-and Repeat distribution mode for sequence decoding. It's finally followed by 3 offset
-values, populating recent offsets (instead of using `{1,4,8}`), stored in order,
-4-bytes **little-endian** each, for a total of 12 bytes. Each recent offset must
-have a value <= dictionary content size, and cannot equal 0.
+**`Entropy_Tables`** : follow the same format as tables in [compressed blocks].
+See the relevant [FSE](#fse-table-description) and
+[Huffman](#huffman-tree-description) sections for how to decode these tables.
+They are stored in following order : Huffman tables for literals, FSE table for
+offsets, FSE table for match lengths, and FSE table for literals lengths. These
+tables populate the Repeat Stats literals mode and Repeat distribution mode for
+sequence decoding. It's finally followed by 3 offset values, populating recent
+offsets (instead of using `{1,4,8}`), stored in order, 4-bytes **little-endian**
+each, for a total of 12 bytes. Each recent offset must have a value <=
+dictionary content size, and cannot equal 0.
 
 **`Content`** : The rest of the dictionary is its content. The content act as a
 "past" in front of data to compress or decompress, so it can be referenced in
@@ -1906,9 +1880,10 @@ which reason it cannot (memory limit restrictions for example).
 
 ## Version changes
 
-<<<<<<< HEAD
-Version changes
----------------
+<<<<<<< HEAD Version changes
+
+---
+
 - 0.4.3 : clarifications for Huffman prefix code assignment example
 - 0.4.2 : refactor FSE table construction process, inspired by Donald Pian
 - 0.4.1 : clarifications on a few error scenarios, by Eric Lasota
@@ -1923,7 +1898,33 @@ Version changes
 - 0.3.2 : remove additional block size restriction on compressed blocks
 - 0.3.1 : minor clarification regarding offset history update rules
 - 0.3.0 : minor edits to match RFC8478
-- 0.2.9 : clarifications for huffman weights direct representation, by Ulrich Kunitz
+- 0.2.9 : clarifications for huffman weights direct representation, by Ulrich
+  Kunitz
+- 0.2.8 : clarifications for IETF RFC discuss
+- 0.2.7 : clarifications from IETF RFC review, by Vijay Gurbani and Nick Terrell
+- 0.2.6 : fixed an error in huffman example, by Ulrich Kunitz
+- 0.2.5 : minor typos and clarifications
+- 0.2.4 : section restructuring, by Sean Purcell
+- 0.2.3 : clarified several details, by Sean Purcell
+- 0.2.2 : added predefined codes, by Johannes Rudolph
+- 0.2.1 : clarify field names, by Przemyslaw Skibinski
+- 0.2.0 : numerous format adjustments for zstd v0.8+
+- 0.1.2 : limit Huffman tree depth to 11 bits
+- 0.1.1 : reserved dictID ranges
+- # 0.1.0 : initial release
+- 0.4.0 : fixed imprecise behavior for nbSeq==0, detected by Igor Pavlov
+- 0.3.9 : clarifications for Huffman-compressed literal sizes.
+- 0.3.8 : clarifications for Huffman Blocks and Huffman Tree descriptions.
+- 0.3.7 : clarifications for Repeat_Offsets, matching RFC8878
+- 0.3.6 : clarifications for Dictionary_ID
+- 0.3.5 : clarifications for Block_Maximum_Size
+- 0.3.4 : clarifications for FSE decoding table
+- 0.3.3 : clarifications for field Block_Size
+- 0.3.2 : remove additional block size restriction on compressed blocks
+- 0.3.1 : minor clarification regarding offset history update rules
+- 0.3.0 : minor edits to match RFC8478
+- 0.2.9 : clarifications for huffman weights direct representation, by Ulrich
+  Kunitz
 - 0.2.8 : clarifications for IETF RFC discuss
 - 0.2.7 : clarifications from IETF RFC review, by Vijay Gurbani and Nick Terrell
 - 0.2.6 : fixed an error in huffman example, by Ulrich Kunitz
@@ -1936,31 +1937,4 @@ Version changes
 - 0.1.2 : limit Huffman tree depth to 11 bits
 - 0.1.1 : reserved dictID ranges
 - 0.1.0 : initial release
-=======
--   0.4.0 : fixed imprecise behavior for nbSeq==0, detected by Igor Pavlov
--   0.3.9 : clarifications for Huffman-compressed literal sizes.
--   0.3.8 : clarifications for Huffman Blocks and Huffman Tree descriptions.
--   0.3.7 : clarifications for Repeat_Offsets, matching RFC8878
--   0.3.6 : clarifications for Dictionary_ID
--   0.3.5 : clarifications for Block_Maximum_Size
--   0.3.4 : clarifications for FSE decoding table
--   0.3.3 : clarifications for field Block_Size
--   0.3.2 : remove additional block size restriction on compressed blocks
--   0.3.1 : minor clarification regarding offset history update rules
--   0.3.0 : minor edits to match RFC8478
--   0.2.9 : clarifications for huffman weights direct representation, by Ulrich
-    Kunitz
--   0.2.8 : clarifications for IETF RFC discuss
--   0.2.7 : clarifications from IETF RFC review, by Vijay Gurbani and Nick
-    Terrell
--   0.2.6 : fixed an error in huffman example, by Ulrich Kunitz
--   0.2.5 : minor typos and clarifications
--   0.2.4 : section restructuring, by Sean Purcell
--   0.2.3 : clarified several details, by Sean Purcell
--   0.2.2 : added predefined codes, by Johannes Rudolph
--   0.2.1 : clarify field names, by Przemyslaw Skibinski
--   0.2.0 : numerous format adjustments for zstd v0.8+
--   0.1.2 : limit Huffman tree depth to 11 bits
--   0.1.1 : reserved dictID ranges
--   0.1.0 : initial release
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
+    > > > > > > > 037abb476563f4a9926392ddf7fe62db27171149

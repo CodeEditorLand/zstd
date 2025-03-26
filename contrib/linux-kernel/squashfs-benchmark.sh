@@ -26,9 +26,9 @@ echo "sudo mksquashfs $BENCHMARK_DIR $BENCHMARK_FS $@"
 time sudo mksquashfs $BENCHMARK_DIR $BENCHMARK_FS $@ 2> /dev/null > /dev/null
 
 echo "Approximate compression ratio"
-printf "%d / %d\n"                                                             \
-  $(sudo du -sx --block-size=1 $BENCHMARK_DIR | cut -f1)                       \
-  $(sudo du -sx --block-size=1 $BENCHMARK_FS  | cut -f1);
+printf "%d / %d\n" \
+	$(sudo du -sx --block-size=1 $BENCHMARK_DIR | cut -f1) \
+	$(sudo du -sx --block-size=1 $BENCHMARK_FS | cut -f1)
 
 # Mount the filesystem
 sudo mount -t squashfs $BENCHMARK_FS /mnt/squashfs

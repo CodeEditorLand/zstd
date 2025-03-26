@@ -41,8 +41,8 @@ another programming language, a list of known ports and bindings is provided on
 For reference, several fast compression algorithms were tested and compared on a
 desktop featuring a Core i7-9700K CPU @ 4.9GHz and running Ubuntu 20.04
 (`Linux ubu20 5.15.0-101-generic`), using [lzbench], an open-source in-memory
-benchmark by @inikep compiled with [gcc] 9.4.0, on the [Silesia
-compression corpus].
+benchmark by @inikep compiled with [gcc] 9.4.0, on the [Silesia compression
+corpus].
 
 [lzbench]: https://github.com/inikep/lzbench
 [Silesia compression corpus]:
@@ -151,8 +151,8 @@ create `libzstd` into `lib/`.
 
 Other available options include:
 
--   `make install` : create and install zstd cli, library and man pages
--   `make check` : create and run `zstd`, test its behavior on local platform
+- `make install` : create and install zstd cli, library and man pages
+- `make check` : create and run `zstd`, test its behavior on local platform
 
 The `Makefile` follows the
 [GNU Standard Makefile conventions](https://www.gnu.org/prep/standards/html_node/Makefile-Conventions.html),
@@ -230,12 +230,12 @@ on the ConanCenterIndex repository.
 
 Going into `build` directory, you will find additional possibilities:
 
--   Projects for Visual Studio 2005, 2008 and 2010.
-    -   VS2010 project is compatible with VS2012, VS2013, VS2015 and VS2017.
--   Automated build scripts for Visual compiler by
-    [@KrzysFR](https://github.com/KrzysFR), in `build/VS_scripts`, which will
-    build `zstd` cli and `libzstd` library without any need to open Visual
-    Studio solution.
+- Projects for Visual Studio 2005, 2008 and 2010.
+    - VS2010 project is compatible with VS2012, VS2013, VS2015 and VS2017.
+- Automated build scripts for Visual compiler by
+  [@KrzysFR](https://github.com/KrzysFR), in `build/VS_scripts`, which will
+  build `zstd` cli and `libzstd` library without any need to open Visual Studio
+  solution.
 
 ### Buck
 

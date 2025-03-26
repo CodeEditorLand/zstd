@@ -25,5 +25,5 @@ fi
 set -v
 zstd files/0 -D dicts/0 -q
 zstd -t files/0.zst -D dicts/0
-zstd -t files/0.zst -D dicts/1 && die "Must fail" ||:
-zstd -t files/0.zst            && die "Must fail" ||:
+zstd -t files/0.zst -D dicts/1 && die "Must fail" || :
+zstd -t files/0.zst && die "Must fail" || :

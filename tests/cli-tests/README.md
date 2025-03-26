@@ -107,9 +107,9 @@ When executing your `$TEST` executable, by default the expected stderr and
 stdout are empty. However, you can override the default by providing one of
 three files:
 
--   `$TEST.{stdout,stderr}.exact`
--   `$TEST.{stdout,stderr}.glob`
--   `$TEST.{stdout,stderr}.ignore`
+- `$TEST.{stdout,stderr}.exact`
+- `$TEST.{stdout,stderr}.glob`
+- `$TEST.{stdout,stderr}.ignore`
 
 If you provide a `.exact` file, the output is expected to exactly match,
 byte-for-byte.
@@ -231,10 +231,10 @@ directory in the test directory is a test-suite consisting of all tests within
 that directory (but not sub-directories). This test suite can come with 4
 scripts to help test writing:
 
--   `setup_once`
--   `teardown_once`
--   `setup`
--   `teardown`
+- `setup_once`
+- `teardown_once`
+- `setup`
+- `teardown`
 
 The `setup_once` and `teardown_once` are run once before and after all the tests
 in the suite respectively. They operate in the scratch directory for the test

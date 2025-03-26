@@ -3,7 +3,6 @@ set -e
 set -u
 set -x
 
-
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 PROG_DIR="$SCRIPT_DIR/../programs"
 
@@ -16,12 +15,12 @@ ZSTD_FRUGAL="$PROG_DIR/zstd-frugal"
 ZSTD_NOMT="$PROG_DIR/zstd-nomt"
 
 println() {
-    printf '%b\n' "${*}"
+	printf '%b\n' "${*}"
 }
 
 die() {
-    println "$@" 1>&2
-    exit 1
+	println "$@" 1>&2
+	exit 1
 }
 
 symbol_present() {
@@ -29,7 +28,7 @@ symbol_present() {
 }
 
 symbol_not_present() {
-	symbol_present $@ && die "Binary '$1' mistakenly contains symbol '$2'" ||:
+	symbol_present $@ && die "Binary '$1' mistakenly contains symbol '$2'" || :
 }
 
 compress_not_present() {
@@ -59,7 +58,7 @@ test_help() {
 }
 
 test_no_help() {
-	test_help $@ && die "'$1' supports '$2' when it shouldn't" ||:
+	test_help $@ && die "'$1' supports '$2' when it shouldn't" || :
 }
 
 extras_not_present() {

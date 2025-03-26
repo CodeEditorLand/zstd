@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 ECHO=echo
 RM="rm -f"
@@ -8,17 +8,17 @@ GREP="grep"
 INTOVOID="/dev/null"
 
 die() {
-    $ECHO "$@" 1>&2
-    exit 1
+	$ECHO "$@" 1>&2
+	exit 1
 }
 
 isPresent() {
-    $GREP $@ tmplog || die "$@" "should be present"
+	$GREP $@ tmplog || die "$@" "should be present"
 }
 
 mustBeAbsent() {
-    $GREP $@ tmplog && die "$@ should not be there !!"
-    $ECHO "$@ correctly not present"  # for some reason, this $ECHO must exist, otherwise mustBeAbsent() always fails (??)
+	$GREP $@ tmplog && die "$@ should not be there !!"
+	$ECHO "$@ correctly not present" # for some reason, this $ECHO must exist, otherwise mustBeAbsent() always fails (??)
 }
 
 # default compilation : all features enabled - no zbuff

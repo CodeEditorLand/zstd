@@ -21,7 +21,7 @@ for args in \
 	println >&2 "compress pipe to pipe"
 	zstd $args < hello > $INTOVOID
 	println >&2 "compress pipe to file"
-	zstd $args < hello -fo hello.zst
+	zstd $args -fo hello.zst < hello
 	println >&2 "compress file to pipe"
 	zstd $args hello -c > $INTOVOID
 	println >&2 "compress 2 files"
@@ -32,7 +32,7 @@ for args in \
 	println >&2 "decompress pipe to pipe"
 	zstd $args -d < hello.zst > $INTOVOID
 	println >&2 "decompress pipe to file"
-	zstd $args -d < hello.zst -fo hello
+	zstd $args -d -fo hello < hello.zst
 	println >&2 "decompress file to pipe"
 	zstd $args -d hello.zst -c > $INTOVOID
 	println >&2 "decompress 2 files"

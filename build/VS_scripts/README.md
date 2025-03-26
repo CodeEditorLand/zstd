@@ -16,13 +16,13 @@ folder.
 
 If you want to only need one architecture:
 
--   Win32: `build.generic.cmd VS2013 Win32 Release v120`
--   x64: `build.generic.cmd VS2013 x64 Release v120`
+- Win32: `build.generic.cmd VS2013 Win32 Release v120`
+- x64: `build.generic.cmd VS2013 x64 Release v120`
 
 If you want a Debug build:
 
--   Win32: `build.generic.cmd VS2013 Win32 Debug v120`
--   x64: `build.generic.cmd VS2013 x64 Debug v120`
+- Win32: `build.generic.cmd VS2013 Win32 Debug v120`
+- x64: `build.generic.cmd VS2013 x64 Debug v120`
 
 ### Build with Visual Studio 2015 for msvcr140.dll
 
@@ -38,13 +38,13 @@ folder.
 
 If you want to only need one architecture:
 
--   Win32: `build.generic.cmd VS2015 Win32 Release v140`
--   x64: `build.generic.cmd VS2015 x64 Release v140`
+- Win32: `build.generic.cmd VS2015 Win32 Release v140`
+- x64: `build.generic.cmd VS2015 x64 Release v140`
 
 If you want a Debug build:
 
--   Win32: `build.generic.cmd VS2015 Win32 Debug v140`
--   x64: `build.generic.cmd VS2015 x64 Debug v140`
+- Win32: `build.generic.cmd VS2015 Win32 Debug v140`
+- x64: `build.generic.cmd VS2015 x64 Debug v140`
 
 ### Build with Visual Studio 2015 for msvcr120.dll
 

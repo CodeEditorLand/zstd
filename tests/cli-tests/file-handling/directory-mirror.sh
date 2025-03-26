@@ -21,8 +21,14 @@ rm -rf mid dst
 mkdir mid dst
 
 # from inside the directory
-(cd src; zstd -q -r --output-dir-mirror ../mid/ ./)
-(cd mid; zstd -q -d -r --output-dir-mirror ../dst/ ./)
+(
+	cd src
+	zstd -q -r --output-dir-mirror ../mid/ ./
+)
+(
+	cd mid
+	zstd -q -d -r --output-dir-mirror ../dst/ ./
+)
 
 diff --brief --recursive --new-file src/ dst/
 
@@ -34,7 +40,7 @@ mkdir mid dst
 export BASE_PATH="$(pwd)"
 
 zstd -q -r --output-dir-mirror mid/ "${BASE_PATH}/src/"
-zstd -q -d -r --output-dir-mirror  dst/ "${BASE_PATH}/mid/${BASE_PATH}/src/"
+zstd -q -d -r --output-dir-mirror dst/ "${BASE_PATH}/mid/${BASE_PATH}/src/"
 
 diff --brief --recursive --new-file src/ "dst/${BASE_PATH}/mid/${BASE_PATH}/src/"
 
@@ -44,6 +50,6 @@ mkdir mid dst
 
 # dots
 zstd -q -r --output-dir-mirror mid/ ./src/./
-zstd -q -d -r --output-dir-mirror  dst/ ./mid/./src/./
+zstd -q -d -r --output-dir-mirror dst/ ./mid/./src/./
 
 diff --brief --recursive --new-file src/ dst/mid/src/

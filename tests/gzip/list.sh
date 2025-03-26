@@ -17,15 +17,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # limit so don't run it by default.
 
-. "${srcdir=.}/init.sh"; path_prepend_ .
+. "${srcdir=.}/init.sh"
+path_prepend_ .
 
 echo zoology zucchini > in || framework_failure_
 cp in orig || framework_failure_
 
 gzip -l in && fail=1
 gzip -9 in || fail=1
-gzip -l in.gz >out1 || fail=1
-gzip -l in.gz | cat >out2 || fail=1
+gzip -l in.gz > out1 || fail=1
+gzip -l in.gz | cat > out2 || fail=1
 compare out1 out2 || fail=1
 
 Exit $fail

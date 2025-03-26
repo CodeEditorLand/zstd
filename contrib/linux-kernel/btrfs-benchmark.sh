@@ -39,9 +39,9 @@ echo "Compression"
 time sh -c "for i in \$(seq $N); do sudo cp -r $BENCHMARK_DIR /mnt/btrfs/\$i; done; sync"
 
 echo "Approximate compression ratio"
-printf "%d / %d\n"                                                             \
-  $(df /mnt/btrfs --output=used -B 1 | tail -n 1)                              \
-  $(sudo du /mnt/btrfs -b -d 0 | tr '\t' '\n' | head -n 1);
+printf "%d / %d\n" \
+	$(df /mnt/btrfs --output=used -B 1 | tail -n 1) \
+	$(sudo du /mnt/btrfs -b -d 0 | tr '\t' '\n' | head -n 1)
 
 # Unmount and remount to avoid any caching
 sudo umount /mnt/btrfs

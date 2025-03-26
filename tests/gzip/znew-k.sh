@@ -17,9 +17,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # limit so don't run it by default.
 
-. "${srcdir=.}/init.sh"; path_prepend_ .
+. "${srcdir=.}/init.sh"
+path_prepend_ .
 
-cat <<'EOF' >compress || framework_failure_
+cat << 'EOF' > compress || framework_failure_
 #!/bin/sh
 echo >&2 'compress has been invoked'
 exit 1

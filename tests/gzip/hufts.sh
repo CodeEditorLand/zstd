@@ -17,10 +17,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # limit so don't run it by default.
 
-. "${srcdir=.}/init.sh"; path_prepend_ .
+. "${srcdir=.}/init.sh"
+path_prepend_ .
 
 printf '\n...: invalid compressed data--format violated\n' > exp \
-  || framework_failure_
+	|| framework_failure_
 
 fail=0
 gzip -dc "$abs_srcdir/hufts-segv.gz" > out 2> err
@@ -28,7 +29,8 @@ test $? = 1 || fail=1
 
 compare /dev/null out || fail=1
 
-sed 's/.*hufts-segv.gz: /...: /' err > k; mv k err || fail=1
+sed 's/.*hufts-segv.gz: /...: /' err > k
+mv k err || fail=1
 compare exp err || fail=1
 
 Exit $fail

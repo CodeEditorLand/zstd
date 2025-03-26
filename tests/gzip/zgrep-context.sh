@@ -17,17 +17,20 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # limit so don't run it by default.
 
-. "${srcdir=.}/init.sh"; path_prepend_ .
+. "${srcdir=.}/init.sh"
+path_prepend_ .
 
 # A limited replacement for seq: handle 1 or 2 args; increment must be 1
-seq()
-{
-  case $# in
-    1) start=1  final=$1;;
-    2) start=$1 final=$2;;
-    *) echo you lose 1>&2; exit 1;;
-  esac
-  awk 'BEGIN{for(i='$start';i<='$final';i++) print i}' < /dev/null
+seq() {
+	case $# in
+		1) start=1 final=$1 ;;
+		2) start=$1 final=$2 ;;
+		*)
+			echo you lose 1>&2
+			exit 1
+			;;
+	esac
+	awk 'BEGIN{for(i='$start';i<='$final';i++) print i}' < /dev/null
 }
 
 seq 40 > in || framework_failure_
@@ -36,8 +39,8 @@ seq 2 32 > exp || framework_failure_
 
 : ${GREP=grep}
 $GREP -15 17 - < in > out && compare exp out || {
-  echo >&2 "$0: $GREP does not support context options; skipping this test"
-  exit 77
+	echo >&2 "$0: $GREP does not support context options; skipping this test"
+	exit 77
 }
 
 fail=0

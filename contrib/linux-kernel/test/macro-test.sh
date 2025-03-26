@@ -6,24 +6,23 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 INCLUDE_DIR="$SCRIPT_DIR/../linux/include"
 LIB_DIR="$SCRIPT_DIR/../linux/lib"
 
-
 print() {
-    printf '%b' "${*}"
+	printf '%b' "${*}"
 }
 
 println() {
-    printf '%b\n' "${*}"
+	printf '%b\n' "${*}"
 }
 
 die() {
-    println "$@" 1>&2
-    exit 1
+	println "$@" 1>&2
+	exit 1
 }
 
 test_not_present() {
-    print "Testing that '$1' is not present... "
-    grep -r $1 "$INCLUDE_DIR" "$LIB_DIR" && die "Fail!"
-    println "Okay"
+	print "Testing that '$1' is not present... "
+	grep -r $1 "$INCLUDE_DIR" "$LIB_DIR" && die "Fail!"
+	println "Okay"
 }
 
 println "This test checks that the macro removal process worked as expected"

@@ -17,7 +17,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # limit so don't run it by default.
 
-. "${srcdir=.}/init.sh"; path_prepend_ .
+. "${srcdir=.}/init.sh"
+path_prepend_ .
 
 printf anything | gzip > F.gz || framework_failure_
 echo y > yes || framework_failure_
@@ -25,7 +26,7 @@ echo "gzip: invalid suffix ''" > expected-err || framework_failure_
 
 fail=0
 
-gzip ---presume-input-tty -d -S '' F.gz < yes > out 2>err && fail=1
+gzip ---presume-input-tty -d -S '' F.gz < yes > out 2> err && fail=1
 
 compare /dev/null out || fail=1
 compare expected-err err || fail=1

@@ -39,9 +39,9 @@ echo "Copy"
 time sh -c "sudo cp -r $BENCHMARK_DIR /mnt/btrfs/$BENCHMARK_FILE && sync"
 
 echo "Approximate tarred compression ratio"
-printf "%d / %d\n"                                                             \
-  $(df /mnt/btrfs --output=used -B 1 | tail -n 1)                              \
-  $(sudo du /mnt/btrfs -b -d 0 | tr '\t' '\n' | head -n 1);
+printf "%d / %d\n" \
+	$(df /mnt/btrfs --output=used -B 1 | tail -n 1) \
+	$(sudo du /mnt/btrfs -b -d 0 | tr '\t' '\n' | head -n 1)
 
 # Unmount and remount to avoid any caching
 sudo umount /mnt/btrfs
@@ -57,9 +57,9 @@ sudo umount /mnt/btrfs
 sudo mount -t btrfs $@ /dev/sda3 /mnt/btrfs
 
 echo "Approximate extracted compression ratio"
-printf "%d / %d\n"                                                             \
-  $(df /mnt/btrfs --output=used -B 1 | tail -n 1)                              \
-  $(sudo du /mnt/btrfs -b -d 0 | tr '\t' '\n' | head -n 1);
+printf "%d / %d\n" \
+	$(df /mnt/btrfs --output=used -B 1 | tail -n 1) \
+	$(sudo du /mnt/btrfs -b -d 0 | tr '\t' '\n' | head -n 1)
 
 echo "Read"
 time sudo tar -c /mnt/btrfs 2> /dev/null | wc -c > /dev/null

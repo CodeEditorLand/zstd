@@ -17,10 +17,10 @@ zstd --fast=1 file -o file-f1.zst -q
 zstd -1 file -o file-1.zst -q
 zstd -19 file -o file-19.zst -q
 if echo "$version_info" | grep -q '32-bit'; then
-    # skip --max test: not enough address space
-    cp file-19.zst file-max.zst
+	# skip --max test: not enough address space
+	cp file-19.zst file-max.zst
 else
-    zstd --max file -o file-max.zst -q
+	zstd --max file -o file-max.zst -q
 fi
 
 zstd -t file-f10.zst file-f1.zst file-1.zst file-19.zst file-max.zst
@@ -43,8 +43,8 @@ zstd -99 file -o file-99.zst -q
 cmp file-19.zst file-99.zst || die "Level 99 is clamped to 19"
 zstd --fast=200000 file -c | zstd -t
 
-zstd -5000000000 -f file       && die "Level too large, must fail" ||:
-zstd --fast=5000000000 -f file && die "Level too large, must fail" ||:
+zstd -5000000000 -f file && die "Level too large, must fail" || :
+zstd --fast=5000000000 -f file && die "Level too large, must fail" || :
 
 # Test setting a level through the environment variable
 ZSTD_CLEVEL=-10 zstd file -o file-f10-env.zst -q
@@ -59,17 +59,24 @@ cmp file-99.zst file-99-env.zst || die "Environment variable failed to set level
 
 # Test invalid environment clevel is the default level
 zstd -f file -q
-ZSTD_CLEVEL=- zstd -f file -o file-env.zst -q      ; cmp file.zst file-env.zst
-ZSTD_CLEVEL=+ zstd -f file -o file-env.zst -q      ; cmp file.zst file-env.zst
-ZSTD_CLEVEL=a zstd -f file -o file-env.zst -q      ; cmp file.zst file-env.zst
-ZSTD_CLEVEL=-a zstd -f file -o file-env.zst -q     ; cmp file.zst file-env.zst
-ZSTD_CLEVEL=+a zstd -f file -o file-env.zst -q     ; cmp file.zst file-env.zst
-ZSTD_CLEVEL=3a7 zstd -f file -o file-env.zst -q    ; cmp file.zst file-env.zst
-ZSTD_CLEVEL=5000000000 zstd -f file -o file-env.zst -q ; cmp file.zst file-env.zst
+ZSTD_CLEVEL=- zstd -f file -o file-env.zst -q
+cmp file.zst file-env.zst
+ZSTD_CLEVEL=+ zstd -f file -o file-env.zst -q
+cmp file.zst file-env.zst
+ZSTD_CLEVEL=a zstd -f file -o file-env.zst -q
+cmp file.zst file-env.zst
+ZSTD_CLEVEL=-a zstd -f file -o file-env.zst -q
+cmp file.zst file-env.zst
+ZSTD_CLEVEL=+a zstd -f file -o file-env.zst -q
+cmp file.zst file-env.zst
+ZSTD_CLEVEL=3a7 zstd -f file -o file-env.zst -q
+cmp file.zst file-env.zst
+ZSTD_CLEVEL=5000000000 zstd -f file -o file-env.zst -q
+cmp file.zst file-env.zst
 
 # Test environment clevel is overridden by command line
 ZSTD_CLEVEL=10 zstd -f file -1 -o file-1-env.zst -q
 ZSTD_CLEVEL=10 zstd -f file --fast=1 -o file-f1-env.zst -q
 
-cmp file-1.zst file-1-env.zst  || die "Environment variable not overridden"
+cmp file-1.zst file-1-env.zst || die "Environment variable not overridden"
 cmp file-f1.zst file-f1-env.zst || die "Environment variable not overridden"

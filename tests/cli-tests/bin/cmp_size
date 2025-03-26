@@ -2,20 +2,24 @@
 
 set -e
 
-usage()
-{
+usage() {
 	printf "USAGE:\n\t$0 [-eq|-ne|-lt|-le|-gt|-ge] FILE1 FILE2\n"
 }
 
-help()
-{
+help() {
 	printf "Small utility to compare file sizes without printing them with set -x.\n\n"
 	usage
 }
 
 case "$1" in
-	-h) help; exit 0  ;;
-	--help) help; exit 0 ;;
+	-h)
+		help
+		exit 0
+		;;
+	--help)
+		help
+		exit 0
+		;;
 esac
 
 if ! test -f $2; then
@@ -29,7 +33,6 @@ if ! test -f $3; then
 	usage
 	exit 1
 fi
-
 
 size1=$(wc -c < $2)
 size2=$(wc -c < $3)

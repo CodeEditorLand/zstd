@@ -48,14 +48,19 @@ cmake -DZSTD_BUILD_TESTS=ON -DZSTD_LEGACY_SUPPORT=OFF ..
 make
 ```
 
-**Apple Frameworks**
-It's generally recommended to have CMake with versions higher than 3.14 for [iOS-derived platforms](https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html#id27).
+**Apple Frameworks** It's generally recommended to have CMake with versions
+higher than 3.14 for
+[iOS-derived platforms](https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html#id27).
+
 ```sh
 cmake -S. -B build-cmake -DZSTD_FRAMEWORK=ON -DCMAKE_SYSTEM_NAME=iOS
 ```
-Or you can utilize [iOS-CMake](https://github.com/leetal/ios-cmake) toolchain for CMake versions lower than 3.14
+
+Or you can utilize [iOS-CMake](https://github.com/leetal/ios-cmake) toolchain
+for CMake versions lower than 3.14
+
 ```sh
-cmake -B build -G Xcode -DCMAKE_TOOLCHAIN_FILE=<Path To ios.toolchain.cmake> -DPLATFORM=OS64 -DZSTD_FRAMEWORK=ON
+cmake -B build -G Xcode -DCMAKE_TOOLCHAIN_FILE= To ios.toolchain.cmake -DZSTD_FRAMEWORK=ON < Path > -DPLATFORM=OS64
 ```
 
 ### how to use it with CMake FetchContent
@@ -100,11 +105,11 @@ target_include_directories(
 
 ### Indent all code correctly, i.e. the body of
 
--   if/else/endif
--   foreach/endforeach
--   while/endwhile
--   macro/endmacro
--   function/endfunction
+- if/else/endif
+- foreach/endforeach
+- while/endwhile
+- macro/endmacro
+- function/endfunction
 
 Use spaces for indenting, 2, 3 or 4 spaces preferably. Use the same amount of
 spaces for indenting as is used in the rest of the file. Do not use tabs.

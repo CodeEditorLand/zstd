@@ -4,4 +4,4 @@ set -e
 
 datagen | zstd -q > file.zst
 
-zstd -dcq --trace-file-stat < file.zst -o file
+zstd -dcq --trace-file-stat -o file < file.zst

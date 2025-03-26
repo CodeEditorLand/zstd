@@ -18,13 +18,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # limit so don't run it by default.
 
-. "${srcdir=.}/init.sh"; path_prepend_ .
+. "${srcdir=.}/init.sh"
+path_prepend_ .
 
 echo a > a || framework_failure_
 echo b > b || framework_failure_
 gzip a b || framework_failure_
 
-cat <<EOF > exp
+cat << EOF > exp
 1c1
 < a
 ---

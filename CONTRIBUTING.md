@@ -160,24 +160,21 @@ It can be useful to look at additional static analyzers once in a while (and we
 do), but it's not a good idea to multiply the nb of analyzers run continuously
 at each commit and PR. The reasons are :
 
--   Static analyzers are full of false positive. The signal to noise ratio is
-    actually pretty low.
--   A good CI policy is "zero-warning tolerance". That means that all issues
-    must be solved, including false positives. This quickly becomes a tedious
-    workload.
--   Multiple static analyzers will feature multiple kind of false positives,
-    sometimes applying to the same code but in different ways leading to :
-    -   tortuous code, trying to please multiple constraints, hurting
-        readability and therefore maintenance. Sometimes, such complexity
-        introduce other more subtle bugs, that are just out of scope of the
-        analyzers.
-    -   sometimes, these constraints are mutually exclusive : if one try to
-        solve one, the other static analyzer will complain, they can't be both
-        happy at the same time.
--   As if that was not enough, the list of false positives change with each
-    version. It's hard enough to follow one static analyzer, but multiple ones
-    with their own update agenda, this quickly becomes a massive velocity
-    reducer.
+- Static analyzers are full of false positive. The signal to noise ratio is
+  actually pretty low.
+- A good CI policy is "zero-warning tolerance". That means that all issues must
+  be solved, including false positives. This quickly becomes a tedious workload.
+- Multiple static analyzers will feature multiple kind of false positives,
+  sometimes applying to the same code but in different ways leading to :
+    - tortuous code, trying to please multiple constraints, hurting readability
+      and therefore maintenance. Sometimes, such complexity introduce other more
+      subtle bugs, that are just out of scope of the analyzers.
+    - sometimes, these constraints are mutually exclusive : if one try to solve
+      one, the other static analyzer will complain, they can't be both happy at
+      the same time.
+- As if that was not enough, the list of false positives change with each
+  version. It's hard enough to follow one static analyzer, but multiple ones
+  with their own update agenda, this quickly becomes a massive velocity reducer.
 
 This is different from running a static analyzer once in a while, looking at the
 output, and **cherry picking** a few warnings that seem helpful, either because
@@ -447,15 +444,15 @@ https://perf.wiki.kernel.org/index.php/Tutorial
 
 Some general notes on perf:
 
--   Use `perf stat -r # <bench-program>` to quickly get some relevant timing and
-    counter statistics. Perf uses a high resolution timer and this is likely one
-    of the first things your team will run when assessing your PR.
--   Perf has a long list of hardware counters that can be viewed with
-    `perf --list`. When measuring optimizations, something worth trying is to
-    make sure the hardware counters you expect to be impacted by your change are
-    in fact being so. For example, if you expect the L1 cache misses to decrease
-    with your change, you can look at the counter `L1-dcache-load-misses`
--   Perf hardware counters will not work on a virtual machine.
+- Use `perf stat -r # <bench-program>` to quickly get some relevant timing and
+  counter statistics. Perf uses a high resolution timer and this is likely one
+  of the first things your team will run when assessing your PR.
+- Perf has a long list of hardware counters that can be viewed with
+  `perf --list`. When measuring optimizations, something worth trying is to make
+  sure the hardware counters you expect to be impacted by your change are in
+  fact being so. For example, if you expect the L1 cache misses to decrease with
+  your change, you can look at the counter `L1-dcache-load-misses`
+- Perf hardware counters will not work on a virtual machine.
 
 #### Visual Studio
 
@@ -496,97 +493,96 @@ base.
 
 #### Dependencies
 
--   Reduce dependencies to the minimum possible level. Any dependency should be
-    considered “bad” by default, and only tolerated because it provides a
-    service in a better way than can be achieved locally. The only external
-    dependencies this repository tolerates are standard C libraries, and in rare
-    cases, system level headers.
--   Within `lib/`, this policy is even more drastic. The only external
-    dependencies allowed are `<assert.h>`, `<stdlib.h>`, `<string.h>`, and even
-    then, not directly. In particular, no function shall ever allocate on heap
-    directly, and must use instead `ZSTD_malloc()` and equivalent. Other
-    accepted non-symbol headers are `<stddef.h>` and `<limits.h>`.
--   Within the project, there is a strict hierarchy of dependencies that must be
-    respected. `programs/` is allowed to depend on `lib/`, but only its public
-    API. Within `lib/`, `lib/common` doesn't depend on any other directory.
-    `lib/compress` and `lib/decompress` shall not depend on each other.
-    `lib/dictBuilder` can depend on `lib/common` and `lib/compress`, but not
-    `lib/decompress`.
+- Reduce dependencies to the minimum possible level. Any dependency should be
+  considered “bad” by default, and only tolerated because it provides a service
+  in a better way than can be achieved locally. The only external dependencies
+  this repository tolerates are standard C libraries, and in rare cases, system
+  level headers.
+- Within `lib/`, this policy is even more drastic. The only external
+  dependencies allowed are `<assert.h>`, `<stdlib.h>`, `<string.h>`, and even
+  then, not directly. In particular, no function shall ever allocate on heap
+  directly, and must use instead `ZSTD_malloc()` and equivalent. Other accepted
+  non-symbol headers are `<stddef.h>` and `<limits.h>`.
+- Within the project, there is a strict hierarchy of dependencies that must be
+  respected. `programs/` is allowed to depend on `lib/`, but only its public
+  API. Within `lib/`, `lib/common` doesn't depend on any other directory.
+  `lib/compress` and `lib/decompress` shall not depend on each other.
+  `lib/dictBuilder` can depend on `lib/common` and `lib/compress`, but not
+  `lib/decompress`.
 
 #### Resources
 
--   Functions in `lib/` must use very little stack space, several dozens of
-    bytes max. Everything larger must use the heap allocator, or require a
-    scratch buffer to be emplaced manually.
+- Functions in `lib/` must use very little stack space, several dozens of bytes
+  max. Everything larger must use the heap allocator, or require a scratch
+  buffer to be emplaced manually.
 
 ### Naming
 
--   All public symbols are prefixed with `ZSTD_`
-    -   private symbols, with a scope limited to their own unit, are free of
-        this restriction. However, since `libzstd` source code can be
-        amalgamated, each symbol name must attempt to be (and remain) unique.
-        Avoid too generic names that could become ground for future collisions.
-        This generally implies usage of some form of prefix.
--   For symbols (functions and variables), naming convention is
-    `PREFIX_camelCase`.
-    -   In some advanced cases, one can also find :
-        -   `PREFIX_prefix2_camelCase`
-        -   `PREFIX_camelCase_extendedQualifier`
--   Multi-words names generally consist of an action followed by object:
-    -   for example : `ZSTD_createCCtx()`
--   Prefer positive actions
-    -   `goBackward` rather than `notGoForward`
--   Type names (`struct`, etc.) follow similar convention, except that they are
-    allowed and even invited to start by an Uppercase letter. Example :
-    `ZSTD_CCtx`, `ZSTD_CDict`
--   Macro names are all Capital letters. The same composition rules
-    (`PREFIX_NAME_QUALIFIER`) apply.
--   File names are all lowercase letters. The convention is `snake_case`. File
-    names **must** be unique across the entire code base, even when they stand
-    in clearly separated directories.
+- All public symbols are prefixed with `ZSTD_`
+    - private symbols, with a scope limited to their own unit, are free of this
+      restriction. However, since `libzstd` source code can be amalgamated, each
+      symbol name must attempt to be (and remain) unique. Avoid too generic
+      names that could become ground for future collisions. This generally
+      implies usage of some form of prefix.
+- For symbols (functions and variables), naming convention is
+  `PREFIX_camelCase`.
+    - In some advanced cases, one can also find :
+        - `PREFIX_prefix2_camelCase`
+        - `PREFIX_camelCase_extendedQualifier`
+- Multi-words names generally consist of an action followed by object:
+    - for example : `ZSTD_createCCtx()`
+- Prefer positive actions
+    - `goBackward` rather than `notGoForward`
+- Type names (`struct`, etc.) follow similar convention, except that they are
+  allowed and even invited to start by an Uppercase letter. Example :
+  `ZSTD_CCtx`, `ZSTD_CDict`
+- Macro names are all Capital letters. The same composition rules
+  (`PREFIX_NAME_QUALIFIER`) apply.
+- File names are all lowercase letters. The convention is `snake_case`. File
+  names **must** be unique across the entire code base, even when they stand in
+  clearly separated directories.
 
 ### Qualifiers
 
--   This code base is `const` friendly, if not `const` fanatical. Any variable
-    that can be `const` (aka. read-only) **must** be `const`. Any pointer which
-    content will not be modified must be `const`. This property is then
-    controlled at compiler level. `const` variables are an important signal to
-    readers that this variable isn't modified. Conversely, non-const variables
-    are a signal to readers to watch out for modifications later on in the
-    function.
--   If a function must be inlined, mention it explicitly, using project's own
-    portable macros, such as `FORCE_INLINE_ATTR`, defined in
-    `lib/common/compiler.h`.
+- This code base is `const` friendly, if not `const` fanatical. Any variable
+  that can be `const` (aka. read-only) **must** be `const`. Any pointer which
+  content will not be modified must be `const`. This property is then controlled
+  at compiler level. `const` variables are an important signal to readers that
+  this variable isn't modified. Conversely, non-const variables are a signal to
+  readers to watch out for modifications later on in the function.
+- If a function must be inlined, mention it explicitly, using project's own
+  portable macros, such as `FORCE_INLINE_ATTR`, defined in
+  `lib/common/compiler.h`.
 
 ### Debugging
 
--   **Assertions** are welcome, and should be used very liberally, to control
-    any condition the code expects for its correct execution. These assertion
-    checks will be run in debug builds, and disabled in production.
--   For traces, this project provides its own debug macros, in particular
-    `DEBUGLOG(level, ...)`, defined in `lib/common/debug.h`.
+- **Assertions** are welcome, and should be used very liberally, to control any
+  condition the code expects for its correct execution. These assertion checks
+  will be run in debug builds, and disabled in production.
+- For traces, this project provides its own debug macros, in particular
+  `DEBUGLOG(level, ...)`, defined in `lib/common/debug.h`.
 
 ### Code documentation
 
--   Avoid code documentation that merely repeats what the code is already
-    stating. Whenever applicable, prefer employing the code as the primary way
-    to convey explanations. Example 1 : `int nbTokens = n;` instead of
-    `int i = n; /* i is a nb of tokens *./`. Example 2 : `assert(size > 0);`
-    instead of `/* here, size should be positive */`.
--   At declaration level, the documentation explains how to use the function or
-    variable and when applicable why it's needed, of the scenarios where it can
-    be useful.
--   At implementation level, the documentation explains the general outline of
-    the algorithm employed, and when applicable why this specific choice was
-    preferred.
+- Avoid code documentation that merely repeats what the code is already stating.
+  Whenever applicable, prefer employing the code as the primary way to convey
+  explanations. Example 1 : `int nbTokens = n;` instead of
+  `int i = n; /* i is a nb of tokens *./`. Example 2 : `assert(size > 0);`
+  instead of `/* here, size should be positive */`.
+- At declaration level, the documentation explains how to use the function or
+  variable and when applicable why it's needed, of the scenarios where it can be
+  useful.
+- At implementation level, the documentation explains the general outline of the
+  algorithm employed, and when applicable why this specific choice was
+  preferred.
 
 ### General layout
 
--   4 spaces for indentation rather than tabs
--   Code documentation shall directly precede function declaration or
-    implementation
--   Function implementations and its code documentation should be preceded and
-    followed by an empty line
+- 4 spaces for indentation rather than tabs
+- Code documentation shall directly precede function declaration or
+  implementation
+- Function implementations and its code documentation should be preceded and
+  followed by an empty line
 
 ## License
 

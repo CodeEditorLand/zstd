@@ -18,13 +18,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # limit so don't run it by default.
 
-. "${srcdir=.}/init.sh"; path_prepend_ .
+. "${srcdir=.}/init.sh"
+path_prepend_ .
 
 echo a | gzip -c > f.gz || framework_failure_
 
 test "x$PERL" = x && PERL=perl
-("$PERL" -e 'use POSIX qw(dup2)') >/dev/null 2>&1 ||
-   skip_ "no suitable perl found"
+("$PERL" -e 'use POSIX qw(dup2)') > /dev/null 2>&1 \
+	|| skip_ "no suitable perl found"
 
 # Run the arguments as a command, in a process where stdout is a
 # dangling pipe and SIGPIPE has the default signal-handling action.
@@ -34,14 +35,14 @@ test "x$PERL" = x && PERL=perl
 # pipe's read end before running the program; the equivalent of the
 # shell's "command | :" has a race condition in that COMMAND could
 # write before ":" exits.
-write_to_dangling_pipe () {
-  program=${1?}
-  shift
-  args=
-  for arg; do
-    args="$args, '$arg'"
-  done
-  "$PERL" -e '
+write_to_dangling_pipe() {
+	program=${1?}
+	shift
+	args=
+	for arg; do
+		args="$args, '$arg'"
+	done
+	"$PERL" -e '
      use POSIX qw(dup2);
      $SIG{PIPE} = "DEFAULT";
      pipe my ($read_end, $write_end) or die "pipe: $!\n";
@@ -53,8 +54,8 @@ write_to_dangling_pipe () {
 
 write_to_dangling_pipe cat f.gz f.gz
 signal_status=$?
-test 128 -lt $signal_status ||
-  framework_failure_ 'signal handling busted on this host'
+test 128 -lt $signal_status \
+	|| framework_failure_ 'signal handling busted on this host'
 
 fail=0
 

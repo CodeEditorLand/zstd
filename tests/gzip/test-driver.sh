@@ -1,7 +1,7 @@
 #! /bin/sh
 # test-driver - basic testsuite driver script.
 
-scriptversion=2016-01-11.22; # UTC
+scriptversion=2016-01-11.22 # UTC
 
 # Copyright (C) 2011-2015 Free Software Foundation, Inc.
 #
@@ -31,16 +31,14 @@ scriptversion=2016-01-11.22; # UTC
 # helps a lot in preventing typo-related bugs.
 set -u
 
-usage_error ()
-{
-  echo "$0: $*" >&2
-  print_usage >&2
-  exit 2
+usage_error() {
+	echo "$0: $*" >&2
+	print_usage >&2
+	exit 2
 }
 
-print_usage ()
-{
-  cat <<END
+print_usage() {
+	cat << END
 Usage:
   test-driver --test-name=NAME --log-file=PATH --trs-file=PATH
               [--expect-failure={yes|no}] [--color-tests={yes|no}]
@@ -57,44 +55,71 @@ expect_failure=no
 color_tests=no
 enable_hard_errors=yes
 while test $# -gt 0; do
-  case $1 in
-  --help) print_usage; exit $?;;
-  --version) echo "test-driver $scriptversion"; exit $?;;
-  --test-name) test_name=$2; shift;;
-  --log-file) log_file=$2; shift;;
-  --trs-file) trs_file=$2; shift;;
-  --color-tests) color_tests=$2; shift;;
-  --expect-failure) expect_failure=$2; shift;;
-  --enable-hard-errors) enable_hard_errors=$2; shift;;
-  --) shift; break;;
-  -*) usage_error "invalid option: '$1'";;
-   *) break;;
-  esac
-  shift
+	case $1 in
+		--help)
+			print_usage
+			exit $?
+			;;
+		--version)
+			echo "test-driver $scriptversion"
+			exit $?
+			;;
+		--test-name)
+			test_name=$2
+			shift
+			;;
+		--log-file)
+			log_file=$2
+			shift
+			;;
+		--trs-file)
+			trs_file=$2
+			shift
+			;;
+		--color-tests)
+			color_tests=$2
+			shift
+			;;
+		--expect-failure)
+			expect_failure=$2
+			shift
+			;;
+		--enable-hard-errors)
+			enable_hard_errors=$2
+			shift
+			;;
+		--)
+			shift
+			break
+			;;
+		-*) usage_error "invalid option: '$1'" ;;
+		*) break ;;
+	esac
+	shift
 done
 
 missing_opts=
 test x"$test_name" = x && missing_opts="$missing_opts --test-name"
-test x"$log_file"  = x && missing_opts="$missing_opts --log-file"
-test x"$trs_file"  = x && missing_opts="$missing_opts --trs-file"
+test x"$log_file" = x && missing_opts="$missing_opts --log-file"
+test x"$trs_file" = x && missing_opts="$missing_opts --trs-file"
 if test x"$missing_opts" != x; then
-  usage_error "the following mandatory options are missing:$missing_opts"
+	usage_error "the following mandatory options are missing:$missing_opts"
 fi
 
 if test $# -eq 0; then
-  usage_error "missing argument"
+	usage_error "missing argument"
 fi
 
 if test $color_tests = yes; then
-  # Keep this in sync with 'lib/am/check.am:$(am__tty_colors)'.
-  red='[0;31m' # Red.
-  grn='[0;32m' # Green.
-  lgn='[1;32m' # Light green.
-  blu='[1;34m' # Blue.
-  mgn='[0;35m' # Magenta.
-  std='[m'     # No color.
+	# Keep this in sync with 'lib/am/check.am:$(am__tty_colors)'.
+	red='[0;31m' # Red.
+	grn='[0;32m' # Green.
+	lgn='[1;32m' # Light green.
+	blu='[1;34m' # Blue.
+	mgn='[0;35m' # Magenta.
+	std='[m'     # No color.
 else
-  red= grn= lgn= blu= mgn= std=
+	red= grn= lgn= blu= mgn= std=
 fi
 
 do_exit='rm -f $log_file $trs_file; (exit $st); exit $st'
@@ -104,29 +129,29 @@ trap "st=141; $do_exit" 13
 trap "st=143; $do_exit" 15
 
 # Test script is run here.
-"$@" >$log_file 2>&1
+"$@" > $log_file 2>&1
 estatus=$?
 
 if test $enable_hard_errors = no && test $estatus -eq 99; then
-  tweaked_estatus=1
+	tweaked_estatus=1
 else
-  tweaked_estatus=$estatus
+	tweaked_estatus=$estatus
 fi
 
 case $tweaked_estatus:$expect_failure in
-  0:yes) col=$red res=XPASS recheck=yes gcopy=yes;;
-  0:*)   col=$grn res=PASS  recheck=no  gcopy=no;;
-  77:*)  col=$blu res=SKIP  recheck=no  gcopy=yes;;
-  99:*)  col=$mgn res=ERROR recheck=yes gcopy=yes;;
-  *:yes) col=$lgn res=XFAIL recheck=no  gcopy=yes;;
-  *:*)   col=$red res=FAIL  recheck=yes gcopy=yes;;
+	0:yes) col=$red res=XPASS recheck=yes gcopy=yes ;;
+	0:*) col=$grn res=PASS recheck=no gcopy=no ;;
+	77:*) col=$blu res=SKIP recheck=no gcopy=yes ;;
+	99:*) col=$mgn res=ERROR recheck=yes gcopy=yes ;;
+	*:yes) col=$lgn res=XFAIL recheck=no gcopy=yes ;;
+	*:*) col=$red res=FAIL recheck=yes gcopy=yes ;;
 esac
 
 # Report the test outcome and exit status in the logs, so that one can
 # know whether the test passed or failed simply by looking at the '.log'
 # file, without the need of also peaking into the corresponding '.trs'
 # file (automake bug#11814).
-echo "$res $test_name (exit status: $estatus)" >>$log_file
+echo "$res $test_name (exit status: $estatus)" >> $log_file
 
 # Report outcome to console.
 echo "${col}${res}${std}: $test_name"

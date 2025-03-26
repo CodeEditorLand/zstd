@@ -2,18 +2,18 @@
 
 This directory contains the following programs and scripts:
 
--   `datagen` : Synthetic and parametrable data generator, for tests
--   `fullbench` : Precisely measure speed for each zstd inner functions
--   `fuzzer` : Test tool, to check zstd integrity on target platform
--   `paramgrill` : parameter tester for zstd
--   `test-zstd-speed.py` : script for testing zstd speed difference between
-    commits
--   `test-zstd-versions.py` : compatibility test between zstd versions stored on
-    Github (v0.1+)
--   `zstreamtest` : Fuzzer test tool for zstd streaming API
--   `legacy` : Test tool to test decoding of legacy zstd frames
--   `decodecorpus` : Tool to generate valid Zstandard frames, for verifying
-    decoder implementations
+- `datagen` : Synthetic and parametrable data generator, for tests
+- `fullbench` : Precisely measure speed for each zstd inner functions
+- `fuzzer` : Test tool, to check zstd integrity on target platform
+- `paramgrill` : parameter tester for zstd
+- `test-zstd-speed.py` : script for testing zstd speed difference between
+  commits
+- `test-zstd-versions.py` : compatibility test between zstd versions stored on
+  Github (v0.1+)
+- `zstreamtest` : Fuzzer test tool for zstd streaming API
+- `legacy` : Test tool to test decoding of legacy zstd frames
+- `decodecorpus` : Tool to generate valid Zstandard frames, for verifying
+  decoder implementations
 
 #### `test-zstd-versions.py` - script for testing zstd interoperability between versions
 
@@ -81,15 +81,15 @@ warning e-mail is sent to recipients from the list (the `emails` parameter).
 
 Additional remarks:
 
--   To be sure that speed results are accurate the script should be run on a
-    "stable" target system with no other jobs running in parallel
--   Using the script with virtual machines can lead to large variations of speed
-    results
--   The speed benchmark is not performed until computers' load average is lower
-    than `maxLoadAvg` (an optional parameter, default 0.75)
--   The script sends e-mails using `mutt`; if `mutt` is not available it sends
-    e-mails without attachments using `mail`; if both are not available it only
-    prints a warning
+- To be sure that speed results are accurate the script should be run on a
+  "stable" target system with no other jobs running in parallel
+- Using the script with virtual machines can lead to large variations of speed
+  results
+- The speed benchmark is not performed until computers' load average is lower
+  than `maxLoadAvg` (an optional parameter, default 0.75)
+- The script sends e-mails using `mutt`; if `mutt` is not available it sends
+  e-mails without attachments using `mail`; if both are not available it only
+  prints a warning
 
 The example usage with two test files, one e-mail address, and with an
 additional message:

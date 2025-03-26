@@ -29,10 +29,10 @@ format by placing the seek table in a Zstandard skippable frame.
 
 In this document:
 
--   square brackets i.e. `[` and `]` are used to indicate optional fields or
-    parameters.
--   the naming convention for identifiers is `Mixed_Case_With_Underscores`
--   All numeric fields are little-endian unless specified otherwise
+- square brackets i.e. `[` and `]` are used to indicate optional fields or
+  parameters.
+- the naming convention for identifiers is `Mixed_Case_With_Underscores`
+- All numeric fields are little-endian unless specified otherwise
 
 ## Format
 
@@ -134,4 +134,4 @@ stored in little-endian format.
 
 ## Version Changes
 
--   0.1.0: initial version
+- 0.1.0: initial version

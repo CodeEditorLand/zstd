@@ -34,8 +34,8 @@ zstd -d --pass-through file -o pass-through-file
 zstd -dcf file
 zstd -dcf file file.zst
 zstd -df < file
-zstd -dcf < file file.zst -
-zstd -dcf < file.zst file -
+zstd -dcf file.zst - < file
+zstd -dcf file - < file.zst
 
 $DIFF file pass-through-file
 
@@ -53,5 +53,5 @@ zstd -d < file && die "should fail"
 zstd --no-pass-through -dcf file && die "should fail"
 zstd --no-pass-through -dcf file file.zst && die "should fail"
 zstd --no-pass-through -df < file && die "should fail"
-zstd --no-pass-through -dcf < file file.zst - && die "should fail"
-zstd --no-pass-through -dcf < file.zst file - && die "should fail" ||:
+zstd --no-pass-through -dcf file.zst - < file && die "should fail"
+zstd --no-pass-through -dcf file - < file.zst && die "should fail" || :

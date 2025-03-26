@@ -126,13 +126,13 @@ is 2 bytes and the bitstream size is 1 byte.
 
 For example:
 
--   There is 1 sequence in the block
--   `Literals_Lengths_Mode` is `FSE_Compressed_Mode` & the serialized table size
-    is 2 bytes
--   `Offsets_Mode` is `Predefined_Mode`
--   `Match_Lengths_Mode` is `Predefined_Mode`
--   The bitstream is 1 byte. E.g. there is only one sequence and it fits in 1
-    byte.
+- There is 1 sequence in the block
+- `Literals_Lengths_Mode` is `FSE_Compressed_Mode` & the serialized table size
+  is 2 bytes
+- `Offsets_Mode` is `Predefined_Mode`
+- `Match_Lengths_Mode` is `Predefined_Mode`
+- The bitstream is 1 byte. E.g. there is only one sequence and it fits in 1
+  byte.
 
 The total `Block_Content` is `5` bytes, and `Last_Table_Offset` is `2`.
 
@@ -154,9 +154,9 @@ https://gist.github.com/embg/9940726094f4cf2cef162cffe9319232)
 v1.5.6 fixes several bugs in which the magicless-format decoder rejects valid
 frames. These include but are not limited to:
 
--   Valid frames that happen to begin with a legacy magic number (little-endian)
--   Valid frames that happen to begin with a skippable magic number
-    (little-endian)
+- Valid frames that happen to begin with a legacy magic number (little-endian)
+- Valid frames that happen to begin with a skippable magic number
+  (little-endian)
 
 If you are affected by this issue and cannot update to v1.5.6 or later, there is
 a workaround to recover affected data. Simply prepend the ZSTD magic number

@@ -18,20 +18,31 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # limit so don't run it by default.
 
-. "${srcdir=.}/init.sh"; path_prepend_ .
+. "${srcdir=.}/init.sh"
+path_prepend_ .
 
-(echo 0 | gzip; printf '\0') > 0.gz || framework_failure_
-(echo 00 | gzip; printf '\0\0') > 00.gz || framework_failure_
-(echo 1 | gzip; printf '\1') > 1.gz || framework_failure_
+(
+	echo 0 | gzip
+	printf '\0'
+) > 0.gz || framework_failure_
+(
+	echo 00 | gzip
+	printf '\0\0'
+) > 00.gz || framework_failure_
+(
+	echo 1 | gzip
+	printf '\1'
+) > 1.gz || framework_failure_
 
 fail=0
 
 for i in 0 00 1; do
-  gzip -d $i.gz; ret=$?
-  test $ret -eq $i || fail=1
-  test $ret = 1 && continue
-  echo $i > exp || fail=1
-  compare exp $i || fail=1
+	gzip -d $i.gz
+	ret=$?
+	test $ret -eq $i || fail=1
+	test $ret = 1 && continue
+	echo $i > exp || fail=1
+	compare exp $i || fail=1
 done
 
 Exit $fail

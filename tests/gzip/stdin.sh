@@ -17,13 +17,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # limit so don't run it by default.
 
-. "${srcdir=.}/init.sh"; path_prepend_ .
+. "${srcdir=.}/init.sh"
+path_prepend_ .
 
 printf a | gzip > in || framework_failure_
 printf aaa > exp || framework_failure_
 
 fail=0
-gzip -dc in - in < in > out 2>err || fail=1
+gzip -dc in - in < in > out 2> err || fail=1
 
 compare exp out || fail=1
 compare /dev/null err || fail=1

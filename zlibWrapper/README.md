@@ -7,13 +7,13 @@ to allow a quick and smooth transition to zstd for projects already using zlib.
 
 To build the zstd wrapper for zlib the following files are required:
 
--   zlib.h
--   a static or dynamic zlib library
--   zlibWrapper/zstd_zlibwrapper.h
--   zlibWrapper/zstd_zlibwrapper.c
--   zlibWrapper/gz\*.c files (gzclose.c, gzlib.c, gzread.c, gzwrite.c)
--   zlibWrapper/gz\*.h files (gzcompatibility.h, gzguts.h)
--   a static or dynamic zstd library
+- zlib.h
+- a static or dynamic zlib library
+- zlibWrapper/zstd_zlibwrapper.h
+- zlibWrapper/zstd_zlibwrapper.c
+- zlibWrapper/gz\*.c files (gzclose.c, gzlib.c, gzread.c, gzwrite.c)
+- zlibWrapper/gz\*.h files (gzcompatibility.h, gzguts.h)
+- a static or dynamic zstd library
 
 The first two files are required by all projects using zlib and they are not
 included with the zstd distribution. The further files are supplied with the
@@ -26,10 +26,10 @@ Let's assume that your project that uses zlib is compiled with:
 
 To compile the zstd wrapper with your project you have to do the following:
 
--   change all references with `#include "zlib.h"` to
-    `#include "zstd_zlibwrapper.h"`
--   compile your project with `zstd_zlibwrapper.c`, `gz*.c` and a static or
-    dynamic zstd library
+- change all references with `#include "zlib.h"` to
+  `#include "zstd_zlibwrapper.h"`
+- compile your project with `zstd_zlibwrapper.c`, `gz*.c` and a static or
+  dynamic zstd library
 
 The linking should be changed to:
 `gcc project.o zstd_zlibwrapper.o gz*.c -lz -lzstd`
@@ -40,10 +40,10 @@ After embedding the zstd wrapper within your project the zstd library is turned
 off by default. Your project should work as before with zlib. There are two
 options to enable zstd compression:
 
--   compilation with `-DZWRAP_USE_ZSTD=1` (or using `#define ZWRAP_USE_ZSTD 1`
-    before `#include "zstd_zlibwrapper.h"`)
--   using the `void ZWRAP_useZSTDcompression(int turn_on)` function (declared in
-    `#include "zstd_zlibwrapper.h"`)
+- compilation with `-DZWRAP_USE_ZSTD=1` (or using `#define ZWRAP_USE_ZSTD 1`
+  before `#include "zstd_zlibwrapper.h"`)
+- using the `void ZWRAP_useZSTDcompression(int turn_on)` function (declared in
+  `#include "zstd_zlibwrapper.h"`)
 
 During decompression zlib and zstd streams are automatically detected and
 decompressed using a proper library. This behavior can be changed using
@@ -120,18 +120,18 @@ is automatically detected.
 
 The ordinary zlib compression of two files/streams allocates two contexts:
 
--   for the 1st file calls `deflateInit`, `deflate`, `...`, `deflate`,
-    `deflateEnd`
--   for the 2nd file calls `deflateInit`, `deflate`, `...`, `deflate`,
-    `deflateEnd`
+- for the 1st file calls `deflateInit`, `deflate`, `...`, `deflate`,
+  `deflateEnd`
+- for the 2nd file calls `deflateInit`, `deflate`, `...`, `deflate`,
+  `deflateEnd`
 
 The speed of compression can be improved with reusing a single context with
 following steps:
 
--   initialize the context with `deflateInit`
--   for the 1st file call `deflate`, `...`, `deflate`
--   for the 2nd file call `deflateReset`, `deflate`, `...`, `deflate`
--   free the context with `deflateEnd`
+- initialize the context with `deflateInit`
+- for the 1st file call `deflate`, `...`, `deflate`
+- for the 2nd file call `deflateReset`, `deflate`, `...`, `deflate`
+- free the context with `deflateEnd`
 
 To check the difference we made experiments using `zwrapbench -ri6b6` with zstd
 and zlib compression (both at level 6). The input data was decompressed git
@@ -159,40 +159,40 @@ return Z_STREAM_ERROR.
 
 Supported methods:
 
--   deflateInit
--   deflate (with exception of Z_FULL_FLUSH, Z_BLOCK, and Z_TREES)
--   deflateSetDictionary
--   deflateEnd
--   deflateReset
--   deflateBound
--   inflateInit
--   inflate
--   inflateSetDictionary
--   inflateReset
--   inflateReset2
--   compress
--   compress2
--   compressBound
--   uncompress
--   gzip file access functions
+- deflateInit
+- deflate (with exception of Z_FULL_FLUSH, Z_BLOCK, and Z_TREES)
+- deflateSetDictionary
+- deflateEnd
+- deflateReset
+- deflateBound
+- inflateInit
+- inflate
+- inflateSetDictionary
+- inflateReset
+- inflateReset2
+- compress
+- compress2
+- compressBound
+- uncompress
+- gzip file access functions
 
 Ignored methods (they do nothing):
 
--   deflateParams
+- deflateParams
 
 Unsupported methods:
 
--   deflateCopy
--   deflateTune
--   deflatePending
--   deflatePrime
--   deflateSetHeader
--   inflateGetDictionary
--   inflateCopy
--   inflateSync
--   inflatePrime
--   inflateMark
--   inflateGetHeader
--   inflateBackInit
--   inflateBack
--   inflateBackEnd
+- deflateCopy
+- deflateTune
+- deflatePending
+- deflatePrime
+- deflateSetHeader
+- inflateGetDictionary
+- inflateCopy
+- inflateSync
+- inflatePrime
+- inflateMark
+- inflateGetHeader
+- inflateBackInit
+- inflateBack
+- inflateBackEnd

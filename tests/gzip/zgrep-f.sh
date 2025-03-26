@@ -18,7 +18,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # limit so don't run it by default.
 
-. "${srcdir=.}/init.sh"; path_prepend_ .
+. "${srcdir=.}/init.sh"
+path_prepend_ .
 
 printf 'needle\nn2\n' > n || framework_failure_
 cp n haystack || framework_failure_
@@ -30,11 +31,11 @@ zgrep -f - haystack.gz < n > out 2>&1 || fail=1
 compare out n || fail=1
 
 if ${BASH_VERSION+:} false; then
-  set +o posix
-  # This failed with gzip 1.6.
-  cat n n >nn || framework_failure_
-  eval 'zgrep -h -f <(cat n) haystack.gz haystack.gz' >out || fail=1
-  compare out nn || fail=1
+	set +o posix
+	# This failed with gzip 1.6.
+	cat n n > nn || framework_failure_
+	eval 'zgrep -h -f <(cat n) haystack.gz haystack.gz' > out || fail=1
+	compare out nn || fail=1
 fi
 
 # This failed with gzip 1.4.

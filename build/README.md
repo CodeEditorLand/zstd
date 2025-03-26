@@ -4,14 +4,14 @@
 
 The following projects are included with the zstd distribution:
 
--   `cmake` - CMake project contributed by Artyom Dymchenko
--   `VS2005` - Visual Studio 2005 Project (this project has been moved to the
-    contrib directory and will no longer be supported)
--   `VS2008` - Visual Studio 2008 project
--   `VS2010` - Visual Studio 2010 project (which also works well with Visual
-    Studio 2012, 2013, 2015)
--   `VS_scripts` - command line scripts prepared for Visual Studio compilation
-    without IDE
+- `cmake` - CMake project contributed by Artyom Dymchenko
+- `VS2005` - Visual Studio 2005 Project (this project has been moved to the
+  contrib directory and will no longer be supported)
+- `VS2008` - Visual Studio 2008 project
+- `VS2010` - Visual Studio 2010 project (which also works well with Visual
+  Studio 2012, 2013, 2015)
+- `VS_scripts` - command line scripts prepared for Visual Studio compilation
+  without IDE
 
 #### How to compile zstd with Visual Studio
 
@@ -38,15 +38,15 @@ directory. For example `zstd` set to `x64` and `Release` will be compiled to
 `visual\VS2010\bin\x64_Release\zstd.exe`. The solution file contains the
 following projects:
 
--   `zstd` : Command Line Utility, supporting gzip-like arguments
--   `datagen` : Synthetic and parametrable data generator, for tests
--   `fullbench` : Precisely measure speed for each zstd inner functions
--   `fuzzer` : Test tool, to check zstd integrity on target platform
--   `libzstd` : A static ZSTD library compiled to `libzstd_static.lib`
--   `libzstd-dll` : A dynamic ZSTD library (DLL) compiled to `libzstd.dll` with
-    the import library `libzstd.lib`
--   `fullbench-dll` : The fullbench program compiled with the import library;
-    the executable requires ZSTD DLL
+- `zstd` : Command Line Utility, supporting gzip-like arguments
+- `datagen` : Synthetic and parametrable data generator, for tests
+- `fullbench` : Precisely measure speed for each zstd inner functions
+- `fuzzer` : Test tool, to check zstd integrity on target platform
+- `libzstd` : A static ZSTD library compiled to `libzstd_static.lib`
+- `libzstd-dll` : A dynamic ZSTD library (DLL) compiled to `libzstd.dll` with
+  the import library `libzstd.lib`
+- `fullbench-dll` : The fullbench program compiled with the import library; the
+  executable requires ZSTD DLL
 
 #### Using ZSTD DLL with Microsoft Visual C++ project
 

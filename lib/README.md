@@ -10,8 +10,8 @@ easier to select or exclude features.
 including commands variables, staged install, directory variables and standard
 targets.
 
--   `make` : generates both static and dynamic libraries
--   `make install` : install libraries and headers in target system directories
+- `make` : generates both static and dynamic libraries
+- `make install` : install libraries and headers in target system directories
 
 `libzstd` default scope is pretty large, including compression, decompression,
 dictionary builder, and support for decoding legacy formats >= v0.5.0. The scope
@@ -24,21 +24,20 @@ static library is single-threaded (for compatibility reasons).
 
 Enabling multithreading requires 2 conditions :
 
--   set build macro `ZSTD_MULTITHREAD` (`-DZSTD_MULTITHREAD` for `gcc`)
--   for POSIX systems : compile with pthread (`-pthread` compilation flag for
-    `gcc`)
+- set build macro `ZSTD_MULTITHREAD` (`-DZSTD_MULTITHREAD` for `gcc`)
+- for POSIX systems : compile with pthread (`-pthread` compilation flag for
+  `gcc`)
 
 For convenience, we provide a build target to generate multi and single threaded
 libraries:
 
--   Force enable multithreading on both dynamic and static libraries by
-    appending `-mt` to the target, e.g. `make lib-mt`. Note that the `.pc`
-    generated on calling `make lib-mt` will already include the require Libs and
-    Cflags.
--   Force disable multithreading on both dynamic and static libraries by
-    appending `-nomt` to the target, e.g. `make lib-nomt`.
--   By default, as mentioned before, dynamic library is multithreaded, and
-    static library is single-threaded, e.g. `make lib`.
+- Force enable multithreading on both dynamic and static libraries by appending
+  `-mt` to the target, e.g. `make lib-mt`. Note that the `.pc` generated on
+  calling `make lib-mt` will already include the require Libs and Cflags.
+- Force disable multithreading on both dynamic and static libraries by appending
+  `-nomt` to the target, e.g. `make lib-nomt`.
+- By default, as mentioned before, dynamic library is multithreaded, and static
+  library is single-threaded, e.g. `make lib`.
 
 When linking a POSIX program with a multithreaded version of `libzstd`, note
 that it's necessary to invoke the `-pthread` flag during link stage.
@@ -58,15 +57,15 @@ Zstandard's stable API is exposed within [lib/zstd.h](zstd.h).
 
 Optional advanced features are exposed via :
 
--   `lib/zstd_errors.h` : translates `size_t` function results into a
-    `ZSTD_ErrorCode`, for accurate error handling.
+- `lib/zstd_errors.h` : translates `size_t` function results into a
+  `ZSTD_ErrorCode`, for accurate error handling.
 
--   `ZSTD_STATIC_LINKING_ONLY` : if this macro is defined _before_ including
-    `zstd.h`, it unlocks access to the experimental API, exposed in the second
-    part of `zstd.h`. All definitions in the experimental APIs are unstable,
-    they may still change in the future, or even be removed. As a consequence,
-    experimental definitions shall **_never be used with dynamic library_** !
-    Only static linking is allowed.
+- `ZSTD_STATIC_LINKING_ONLY` : if this macro is defined _before_ including
+  `zstd.h`, it unlocks access to the experimental API, exposed in the second
+  part of `zstd.h`. All definitions in the experimental APIs are unstable, they
+  may still change in the future, or even be removed. As a consequence,
+  experimental definitions shall **_never be used with dynamic library_** ! Only
+  static linking is allowed.
 
 #### Modular build
 
@@ -74,40 +73,40 @@ It's possible to compile only a limited set of features within `libzstd`. The
 file structure is designed to make this selection manually achievable for any
 build system :
 
--   Directory `lib/common` is always required, for all variants.
+- Directory `lib/common` is always required, for all variants.
 
--   Compression source code lies in `lib/compress`
+- Compression source code lies in `lib/compress`
 
--   Decompression source code lies in `lib/decompress`
+- Decompression source code lies in `lib/decompress`
 
--   It's possible to include only `compress` or only `decompress`, they don't
-    depend on each other.
+- It's possible to include only `compress` or only `decompress`, they don't
+  depend on each other.
 
--   `lib/dictBuilder` : makes it possible to generate dictionaries from a set of
-    samples. The API is exposed in `lib/dictBuilder/zdict.h`. This module
-    depends on both `lib/common` and `lib/compress` .
+- `lib/dictBuilder` : makes it possible to generate dictionaries from a set of
+  samples. The API is exposed in `lib/dictBuilder/zdict.h`. This module depends
+  on both `lib/common` and `lib/compress` .
 
--   `lib/legacy` : makes it possible to decompress legacy zstd formats, starting
-    from `v0.1.0`. This module depends on `lib/common` and `lib/decompress`. To
-    enable this feature, define `ZSTD_LEGACY_SUPPORT` during compilation.
-    Specifying a number limits versions supported to that version onward. For
-    example, `ZSTD_LEGACY_SUPPORT=2` means : "support legacy formats >= v0.2.0".
-    Conversely, `ZSTD_LEGACY_SUPPORT=0` means "do **not** support legacy
-    formats". By default, this build macro is set as `ZSTD_LEGACY_SUPPORT=5`.
-    Decoding supported legacy format is a transparent capability triggered
-    within decompression functions. It's also allowed to invoke legacy API
-    directly, exposed in `lib/legacy/zstd_legacy.h`. Each version does also
-    provide its own set of advanced API. For example, advanced API for version
-    `v0.4` is exposed in `lib/legacy/zstd_v04.h` .
+- `lib/legacy` : makes it possible to decompress legacy zstd formats, starting
+  from `v0.1.0`. This module depends on `lib/common` and `lib/decompress`. To
+  enable this feature, define `ZSTD_LEGACY_SUPPORT` during compilation.
+  Specifying a number limits versions supported to that version onward. For
+  example, `ZSTD_LEGACY_SUPPORT=2` means : "support legacy formats >= v0.2.0".
+  Conversely, `ZSTD_LEGACY_SUPPORT=0` means "do **not** support legacy formats".
+  By default, this build macro is set as `ZSTD_LEGACY_SUPPORT=5`. Decoding
+  supported legacy format is a transparent capability triggered within
+  decompression functions. It's also allowed to invoke legacy API directly,
+  exposed in `lib/legacy/zstd_legacy.h`. Each version does also provide its own
+  set of advanced API. For example, advanced API for version `v0.4` is exposed
+  in `lib/legacy/zstd_v04.h` .
 
--   While invoking `make libzstd`, it's possible to define build macros
-    `ZSTD_LIB_COMPRESSION`, `ZSTD_LIB_DECOMPRESSION`, `ZSTD_LIB_DICTBUILDER`,
-    and `ZSTD_LIB_DEPRECATED` as `0` to forgo compilation of the corresponding
-    features. This will also disable compilation of all dependencies (e.g.
-    `ZSTD_LIB_COMPRESSION=0` will also disable dictBuilder).
+- While invoking `make libzstd`, it's possible to define build macros
+  `ZSTD_LIB_COMPRESSION`, `ZSTD_LIB_DECOMPRESSION`, `ZSTD_LIB_DICTBUILDER`, and
+  `ZSTD_LIB_DEPRECATED` as `0` to forgo compilation of the corresponding
+  features. This will also disable compilation of all dependencies (e.g.
+  `ZSTD_LIB_COMPRESSION=0` will also disable dictBuilder).
 
--   There are a number of options that can help minimize the binary size of
-    `libzstd`.
+- There are a number of options that can help minimize the binary size of
+  `libzstd`.
 
     The first step is to select the components needed (using the above-described
     `ZSTD_LIB_COMPRESSION` etc.).
@@ -154,69 +153,67 @@ build system :
     compiler's intermediate representation, e.g., `AR=gcc-ar`). Consult your
     compiler's documentation.
 
--   While invoking `make libzstd`, the build macro
-    `ZSTD_LEGACY_MULTITHREADED_API=1` will expose the deprecated `ZSTDMT` API
-    exposed by `zstdmt_compress.h` in the shared library, which is now hidden by
-    default.
+- While invoking `make libzstd`, the build macro
+  `ZSTD_LEGACY_MULTITHREADED_API=1` will expose the deprecated `ZSTDMT` API
+  exposed by `zstdmt_compress.h` in the shared library, which is now hidden by
+  default.
 
 <<<<<<< HEAD
-- The build macro `STATIC_BMI2` can be set to 1 to force usage of `bmi2` instructions.
-  It is generally not necessary to set this build macro,
-  because `STATIC_BMI2` will be automatically set to 1
-  on detecting the presence of the corresponding instruction set in the compilation target.
-  It's nonetheless available as an optional manual toggle for better control,
-  and can also be used to forcefully disable `bmi2` instructions by setting it to 0.
 
-- The build macro `DYNAMIC_BMI2` can be set to 1 or 0 in order to generate binaries
-  which can detect at runtime the presence of BMI2 instructions, and use them only if present.
-  These instructions contribute to better performance, notably on the decoder side.
-  By default, this feature is automatically enabled on detecting
-  the right instruction set (x64) and compiler (clang or gcc >= 5).
-  It's obviously disabled for different cpus,
-  or when BMI2 instruction set is _required_ by the compiler command line
-  (in this case, only the BMI2 code path is generated).
-  Setting this macro will either force to generate the BMI2 dispatcher (1)
-  or prevent it (0). It overrides automatic detection.
-=======
--   The build macro `DYNAMIC_BMI2` can be set to 1 or 0 in order to generate
-    binaries which can detect at runtime the presence of BMI2 instructions, and
-    use them only if present. These instructions contribute to better
-    performance, notably on the decoder side. By default, this feature is
-    automatically enabled on detecting the right instruction set (x64) and
-    compiler (clang or gcc >= 5). It's obviously disabled for different cpus, or
-    when BMI2 instruction set is _required_ by the compiler command line (in
-    this case, only the BMI2 code path is generated). Setting this macro will
-    either force to generate the BMI2 dispatcher (1) or prevent it (0). It
-    overrides automatic detection.
->>>>>>> 037abb476563f4a9926392ddf7fe62db27171149
+- The build macro `STATIC_BMI2` can be set to 1 to force usage of `bmi2`
+  instructions. It is generally not necessary to set this build macro, because
+  `STATIC_BMI2` will be automatically set to 1 on detecting the presence of the
+  corresponding instruction set in the compilation target. It's nonetheless
+  available as an optional manual toggle for better control, and can also be
+  used to forcefully disable `bmi2` instructions by setting it to 0.
 
--   The build macro `ZSTD_NO_UNUSED_FUNCTIONS` can be defined to hide the
-    definitions of functions that zstd does not use. Not all unused functions
-    are hidden, but they can be if needed. Currently, this macro will hide
-    function definitions in FSE and HUF that use an excessive amount of stack
-    space.
+- The build macro `DYNAMIC_BMI2` can be set to 1 or 0 in order to generate
+  binaries which can detect at runtime the presence of BMI2 instructions, and
+  use them only if present. These instructions contribute to better performance,
+  notably on the decoder side. By default, this feature is automatically enabled
+  on detecting the right instruction set (x64) and compiler (clang or gcc >= 5).
+  It's obviously disabled for different cpus, or when BMI2 instruction set is
+  _required_ by the compiler command line (in this case, only the BMI2 code path
+  is generated). Setting this macro will either force to generate the BMI2
+  dispatcher (1) or prevent it (0). It overrides automatic detection. =======
+- The build macro `DYNAMIC_BMI2` can be set to 1 or 0 in order to generate
+  binaries which can detect at runtime the presence of BMI2 instructions, and
+  use them only if present. These instructions contribute to better performance,
+  notably on the decoder side. By default, this feature is automatically enabled
+  on detecting the right instruction set (x64) and compiler (clang or gcc >= 5).
+  It's obviously disabled for different cpus, or when BMI2 instruction set is
+  _required_ by the compiler command line (in this case, only the BMI2 code path
+  is generated). Setting this macro will either force to generate the BMI2
+  dispatcher (1) or prevent it (0). It overrides automatic detection.
 
--   The build macro `ZSTD_NO_INTRINSICS` can be defined to disable all explicit
-    intrinsics. Compiler builtins are still used.
+    > > > > > > > 037abb476563f4a9926392ddf7fe62db27171149
 
--   The build macro `ZSTD_DECODER_INTERNAL_BUFFER` can be set to control the
-    amount of extra memory used during decompression to store literals. This
-    defaults to 64kB. Reducing this value reduces the memory footprint of
-    `ZSTD_DCtx` decompression contexts, but might also result in a small
-    decompression speed cost.
+- The build macro `ZSTD_NO_UNUSED_FUNCTIONS` can be defined to hide the
+  definitions of functions that zstd does not use. Not all unused functions are
+  hidden, but they can be if needed. Currently, this macro will hide function
+  definitions in FSE and HUF that use an excessive amount of stack space.
 
--   The C compiler macros `ZSTDLIB_VISIBLE`, `ZSTDERRORLIB_VISIBLE` and
-    `ZDICTLIB_VISIBLE` can be overridden to control the visibility of zstd's
-    API. Additionally, `ZSTDLIB_STATIC_API` and `ZDICTLIB_STATIC_API` can be
-    overridden to control the visibility of zstd's static API. Specifically, it
-    can be set to `ZSTDLIB_HIDDEN` to hide the symbols from the shared library.
-    These macros default to `ZSTDLIB_VISIBILITY`, `ZSTDERRORLIB_VSIBILITY`, and
-    `ZDICTLIB_VISIBILITY` if unset, for backwards compatibility with the old
-    macro names.
+- The build macro `ZSTD_NO_INTRINSICS` can be defined to disable all explicit
+  intrinsics. Compiler builtins are still used.
 
--   The C compiler macro `HUF_DISABLE_FAST_DECODE` disables the newer Huffman
-    fast C and assembly decoding loops. You may want to use this macro if these
-    loops are slower on your platform.
+- The build macro `ZSTD_DECODER_INTERNAL_BUFFER` can be set to control the
+  amount of extra memory used during decompression to store literals. This
+  defaults to 64kB. Reducing this value reduces the memory footprint of
+  `ZSTD_DCtx` decompression contexts, but might also result in a small
+  decompression speed cost.
+
+- The C compiler macros `ZSTDLIB_VISIBLE`, `ZSTDERRORLIB_VISIBLE` and
+  `ZDICTLIB_VISIBLE` can be overridden to control the visibility of zstd's API.
+  Additionally, `ZSTDLIB_STATIC_API` and `ZDICTLIB_STATIC_API` can be overridden
+  to control the visibility of zstd's static API. Specifically, it can be set to
+  `ZSTDLIB_HIDDEN` to hide the symbols from the shared library. These macros
+  default to `ZSTDLIB_VISIBILITY`, `ZSTDERRORLIB_VSIBILITY`, and
+  `ZDICTLIB_VISIBILITY` if unset, for backwards compatibility with the old macro
+  names.
+
+- The C compiler macro `HUF_DISABLE_FAST_DECODE` disables the newer Huffman fast
+  C and assembly decoding loops. You may want to use this macro if these loops
+  are slower on your platform.
 
 #### Windows : using MinGW+MSYS to create DLL
 
@@ -261,9 +258,9 @@ towards supported streaming API exposed in `zstd.h`.
 
 The other files are not source code. There are :
 
--   `BUCK` : support for `buck` build system (https://buckbuild.com/)
--   `Makefile` : `make` script to build and install zstd library (static and
-    dynamic)
--   `README.md` : this file
--   `dll/` : resources directory for Windows compilation
--   `libzstd.pc.in` : script for `pkg-config` (used in `make install`)
+- `BUCK` : support for `buck` build system (https://buckbuild.com/)
+- `Makefile` : `make` script to build and install zstd library (static and
+  dynamic)
+- `README.md` : this file
+- `dll/` : resources directory for Windows compilation
+- `libzstd.pc.in` : script for `pkg-config` (used in `make install`)
